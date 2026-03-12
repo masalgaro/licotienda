@@ -1,5 +1,8 @@
-# Virtual Environment
+# Virtual Environments
 /venv
+/env 
+/.env 
+/.venv 
 # IDE stuff
 /.vscode
 /.idea

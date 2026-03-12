@@ -14,6 +14,16 @@ python manage.py startapp carrito
 python3 manage.py startapp carrito
 ```
 
+## Dependencias
+
+Es posible que a medida que expandimos el proyecto necesitemos más dependencias. Para evitar errores y demás, usaremos el archivo de requirements.txt, que permite a pip instalar especificamente las dependencias que necesitamos y en la versión exacta.
+
+**Para agregar** dependencias nuevas al archivo, solo hay que ejecutar `pip freeze > requirements.txt`, lo que agregará todas las dependencias en el entorno virtual al archivo.
+
+**Para descargar** dependencias desde el archivo, hay que ejecutar `pip install -r requirements.txt`.
+
+Recordemos siempre usar un entorno virtual. El .gitignore ya incluye algunos nombres típicos de entornos virtuales, así que de lo posible usemos alguno de esos nombres.
+
 # Estándares a usar
 
 Los más básicos son los recomendados de Python:
