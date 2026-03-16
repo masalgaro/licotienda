@@ -1,1 +1,1 @@
-from .infraestructura.models import MensajeSoporte, InfoContacto
+from .infraestructura.models import SoportePago, InfoContacto

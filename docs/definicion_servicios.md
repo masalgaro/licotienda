@@ -8,8 +8,8 @@ Basado en las **12 Historias de Usuario (HU)** definidas para el sprint actual y
 **Responsable:** Kevin (Integrante 1)
 
 *   **Historias de Usuario Asignadas:**
-    *   `HU 6`: Enviar Soporte (Lógica para que un usuario contacte a la tienda/admin).
-    *   `HU 12`: Mostrar Contacto (Endpoint de info de la tienda).
+    *   `HU 6`: Soporte de Pago (Envío de imagen/comprobante de transferencia capturado por el cliente).
+    *   `HU 12`: Contacto y Redes (Mostrar links a WhatsApp, Instagram y Facebook de la tienda).
 *   **Responsabilidades Transversales (Core):**
     *   Modelo de usuario personalizado (`AbstractUser`) y configuración de Auth/JWT.
     *   Perfiles y roles (`EsCliente`, `EsAdministrador`).

@@ -1,28 +1,32 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import MensajeSoporteSerializer, InfoContactoSerializer
-from ..aplicacion.servicios import enviar_mensaje_soporte, obtener_info_contacto
+from .serializers import SoportePagoSerializer, InfoContactoSerializer
+from ..aplicacion.servicios import registrar_soporte_pago, obtener_info_contacto
 
-class EnviarSoporteView(APIView):
+class RegistrarSoportePagoView(APIView):
     """
-    HU 6 - Enviar Soporte.
+    HU 6 - Enviar Soporte de Pago.
     Endpoint: POST /api/v1/soporte/mensajes/
-    Público. El cliente envía su teléfono, asunto y cuerpo del mensaje.
+    Público. El cliente envía su teléfono y la URL del comprobante de pago.
     """
     def post(self, request):
         telefono = request.data.get('telefono')
-        asunto = request.data.get('asunto')
-        cuerpo = request.data.get('cuerpo')
+        comprobante_url = request.data.get('comprobante_url')
+        notas = request.data.get('notas', '')
 
-        if not all([telefono, asunto, cuerpo]):
+        if not all([telefono, comprobante_url]):
             return Response(
-                {'error': 'Teléfono, asunto y cuerpo son requeridos.'},
+                {'error': 'Teléfono y comprobante_url son requeridos.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        mensaje = enviar_mensaje_soporte(telefono=telefono, asunto=asunto, cuerpo=cuerpo)
-        serializer = MensajeSoporteSerializer(mensaje)
+        soporte = registrar_soporte_pago(
+            telefono=telefono,
+            comprobante_url=comprobante_url,
+            notas=notas
+        )
+        serializer = SoportePagoSerializer(soporte)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

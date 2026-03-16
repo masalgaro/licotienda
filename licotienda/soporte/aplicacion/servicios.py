@@ -1,18 +1,18 @@
-from ..infraestructura.models import MensajeSoporte, InfoContacto
+from ..infraestructura.models import SoportePago, InfoContacto
 from usuarios.infraestructura.models import Cliente
 
-def enviar_mensaje_soporte(telefono: str, asunto: str, cuerpo: str):
+def registrar_soporte_pago(telefono: str, comprobante_url: str, notas: str = ""):
     """
-    Crea un mensaje de soporte vinculado al cliente si existe.
+    Registra el comprobante de pago enviado por el cliente.
     """
     cliente = Cliente.objects.filter(telefono=telefono).first()
-    mensaje = MensajeSoporte.objects.create(
+    soporte = SoportePago.objects.create(
         cliente=cliente,
         telefono_remitente=telefono,
-        asunto=asunto,
-        cuerpo=cuerpo
+        comprobante_url=comprobante_url,
+        notas=notas
     )
-    return mensaje
+    return soporte
 
 
 def obtener_info_contacto():

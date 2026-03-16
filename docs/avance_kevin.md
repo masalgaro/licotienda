@@ -1,6 +1,6 @@
 # Avance Primera Fase - Usuarios y Soporte (Kevin)
 
-¡Hola equipo! Les comparto lo que ya quedó listo en el proyecto para que todos podamos seguir trabajando sobre una base sólida. Me enfoqué en dejar montada la estructura principal y las funciones de usuario que acordamos con el cliente.
+Les comparto lo que ya quedó listo en el proyecto para que todos podamos seguir trabajando sobre una base sólida. Me enfoqué en dejar montada la estructura principal y las funciones de usuario que acordamos con el cliente.
 
 ## 1. El Sistema de "Login" (Sin Contraseñas)
 Después de hablarlo, decidí que para una licorera lo mejor es no complicar al cliente con correos y claves. Lo que hice fue:
@@ -9,9 +9,9 @@ Después de hablarlo, decidí que para una licorera lo mejor es no complicar al 
 - **Solo el administrador tiene clave:** Nosotros sí entramos con usuario y contraseña al panel de control para gestionar todo.
 
 ## 2. Soporte y Contacto (Mis HU)
-Ya quedaron listos los dos temas que me tocaban:
-- **HU 6 (Soporte):** Creé el sistema para que los clientes nos manden mensajes o dudas. Estos mensajes nos llegan directo al panel administrativo.
-- **HU 12 (Info de la tienda):** Ya está el endpoint que muestra el teléfono y dirección de la licorera. Solo falta que cuando tengamos los datos reales de la tienda, los metamos en el panel de admin (les dejé una guía de cómo hacerlo en el archivo `MANUAL_DESARROLLO.md`).
+Ya quedaron listos los dos temas que me tocaban según los requerimientos oficiales:
+- **HU 6 (Soporte de Pago):** Implementé el sistema para que los clientes adjunten la foto o captura de su comprobante de transferencia al comprar. Esto le llega directo al admin para que pueda validar el pago.
+- **HU 12 (Contacto y Redes):** Ya está configurado el espacio para mostrar los enlaces a redes sociales y el link directo al chat de WhatsApp. Solo falta que metamos los links reales en el panel de admin (ver guía `MANUAL_DESARROLLO.md`).
 
 ## 3. Estructura del Código (Arquitectura Hexagonal)
 Para que el código no sea un desorden, usé lo que hablamos de Arquitectura Hexagonal. Cuando vean las carpetas de `usuarios` o `soporte`, verán esto:

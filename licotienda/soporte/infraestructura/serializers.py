@@ -1,13 +1,13 @@
 from rest_framework import serializers
-from .models import MensajeSoporte, InfoContacto
+from .models import SoportePago, InfoContacto
 
-class MensajeSoporteSerializer(serializers.ModelSerializer):
+class SoportePagoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = MensajeSoporte
-        fields = ['id', 'telefono_remitente', 'asunto', 'cuerpo', 'creado_en']
+        model = SoportePago
+        fields = ['id', 'telefono_remitente', 'comprobante_url', 'notas', 'creado_en']
         read_only_fields = ['id', 'creado_en']
 
 class InfoContactoSerializer(serializers.ModelSerializer):
     class Meta:
         model = InfoContacto
-        fields = ['nombre_tienda', 'telefono', 'whatsapp', 'email', 'direccion', 'horario']
+        fields = ['nombre_tienda', 'telefono', 'whatsapp_link', 'facebook_url', 'instagram_url', 'email', 'direccion', 'horario']
