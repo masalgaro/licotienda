@@ -3,8 +3,8 @@ from .models import SoportePago, InfoContacto
 
 @admin.register(SoportePago)
 class SoportePagoAdmin(admin.ModelAdmin):
-    list_display = ('telefono_remitente', 'creado_en')
-    list_filter = ('creado_en',)
+    list_display = ('telefono_remitente', 'estado', 'creado_en')
+    list_filter = ('estado', 'creado_en')
     search_fields = ('telefono_remitente', 'notas')
     readonly_fields = ('creado_en',)
 

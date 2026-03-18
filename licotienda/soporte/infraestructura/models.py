@@ -15,6 +15,15 @@ class SoportePago(models.Model):
     telefono_remitente = models.CharField(max_length=20)
     comprobante_url = models.URLField(max_length=500, help_text="URL de la imagen del comprobante en Supabase")
     notas = models.TextField(blank=True, null=True)
+    estado = models.CharField(
+        max_length=20,
+        choices=[
+            ('Pendiente', 'Pendiente'),
+            ('Aprobado', 'Aprobado'),
+            ('Rechazado', 'Rechazado')
+        ],
+        default='Pendiente'
+    )
     creado_en = models.DateTimeField(auto_now_add=True)
 
     class Meta:
