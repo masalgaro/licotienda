@@ -1,0 +1,268 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Shopping Cart - LaLico</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#32C14D", // Vibrant green from logo
+                        "background-light": "#F8F9FA",
+                        "background-dark": "#0A0A0A",
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#171717",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                    animation: {
+                        'glow': 'glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%, 100%': { boxShadow: '0 0 15px 2px rgba(50, 193, 77, 0.3)' },
+                            '50%': { boxShadow: '0 0 25px 6px rgba(50, 193, 77, 0.6)' },
+                        }
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+    <nav
+        class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 pt-12 pb-4 flex items-center justify-between">
+        <button class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+            <span class="material-icons-round align-middle">arrow_back_ios_new</span>
+        </button>
+        <h1 class="text-xl font-bold tracking-tight">Tu Carrito</h1>
+        <div class="w-10"></div>
+    </nav>
+    <main class="flex-grow px-4 pb-40">
+        <div class="space-y-4 mt-4" id="cart-items-container">
+            <!-- Dynamic content will be rendered here -->
+            <p class="text-center text-slate-500 dark:text-slate-400 py-8" id="empty-cart-msg">Tu carrito está vacío</p>
+        </div>
+        <div class="mt-8 space-y-4">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 px-1">Detalles de Entrega</h2>
+            <div
+                class="bg-card-light dark:bg-card-dark p-4 rounded-2xl border border-slate-100 dark:border-white/5 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <span class="material-icons-round text-primary">location_on</span>
+                </div>
+                <div class="flex-grow">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Dirección de envío</p>
+                    <p class="font-semibold">cra68#61-88</p>
+                </div>
+                <button class="text-primary text-sm font-bold">Cambiar</button>
+            </div>
+            <div
+                class="bg-card-light dark:bg-card-dark p-4 rounded-2xl border border-slate-100 dark:border-white/5 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <span class="material-icons-round text-primary">schedule</span>
+                </div>
+                <div class="flex-grow">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Horario de entrega</p>
+                    <p class="font-semibold">30 MIN POSTERIOR A LA CONFIRMACION DEL PAGO</p>
+                </div>
+                <div class="px-2 py-1 rounded bg-primary/20 text-primary text-[10px] font-bold">OPEN</div>
+            </div>
+        </div>
+        <div
+            class="mt-8 bg-card-light dark:bg-card-dark rounded-2xl p-5 border border-slate-100 dark:border-white/5 space-y-3">
+            <div class="flex justify-between text-slate-500 dark:text-slate-400">
+                <span>Subtotal</span>
+                <span id="cart-page-subtotal">$0</span>
+            </div>
+            <div class="flex justify-between text-slate-500 dark:text-slate-400">
+                <span>Envío</span>
+                <span class="text-primary font-medium">$6,000 PESOS</span>
+            </div>
+            <hr class="border-slate-100 dark:border-white/10 my-1" />
+            <div class="flex justify-between items-center pt-1">
+                <span class="text-lg font-bold">Total</span>
+                <span class="text-2xl font-black text-primary" id="cart-total-final">$0</span>
+            </div>
+        </div>
+    </main>
+    <div
+        class="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background-light dark:from-background-dark via-background-light/95 dark:via-background-dark/95 to-transparent pb-10">
+        <button id="checkout-btn"
+            class="w-full bg-primary text-white py-5 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-2 shadow-lg shadow-primary/20 animate-glow transition-transform active:scale-95 group">
+            <span>Proceder al Pago</span>
+            <span class="material-icons-round group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </button>
+    </div>
+    <div class="fixed -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10"></div>
+    <div class="fixed -bottom-24 -left-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10"></div>
+
+    <div class="h-8"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkoutBtn = document.getElementById('checkout-btn');
+            
+            checkoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Get the text content of the total element
+                const totalText = document.getElementById('cart-total-final').textContent;
+                
+                // Remove the '$' sign and any existing dots (if any) to parse properly
+                // If it's something like "$42.062", we just keep "42062" or whatever the raw number is
+                // Actually, just extract what's after the $ sign
+                const rawVal = totalText.replace('$', '').trim();
+                
+                if (rawVal === "0" || rawVal === "0.00") {
+                    alert("Tu carrito está vacío.");
+                    return;
+                }
+                
+                // Save it to localStorage
+                localStorage.setItem('lalico_cart_total', rawVal);
+                
+                // Redirect to pasarela
+                window.location.href = "{% url 'checkout' %}";
+            });
+        });
+    </script>
+    <script src="{% static 'cart.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('cart-items-container');
+            const subtotalEl = document.getElementById('cart-page-subtotal');
+            const totalEl = document.getElementById('cart-total-final'); // Changed from cart-page-total
+
+            function render() {
+                let cart = window.CartConfig.getCart();
+                let grouped = {};
+                cart.forEach(item => {
+                    if (!grouped[item.name]) {
+                        grouped[item.name] = { ...item, quantity: 1 };
+                    } else {
+                        grouped[item.name].quantity++;
+                    }
+                });
+
+                let itemsHtml = '';
+                let total = 0;
+                let isCOP = false;
+
+                Object.values(grouped).forEach(item => {
+                    let pText = item.price.replace('$', '').trim();
+                    let priceVal = 0;
+                    if (pText.includes('.') && pText.split('.')[1].length === 3) {
+                        isCOP = true;
+                        priceVal = parseFloat(pText.replace('.', ''));
+                    } else if (!pText.includes('.')) {
+                        isCOP = true;
+                        priceVal = parseFloat(pText);
+                    } else {
+                        priceVal = parseFloat(pText);
+                    }
+                    total += (priceVal * item.quantity);
+
+                    itemsHtml += `
+            <div class="bg-card-light dark:bg-card-dark p-4 rounded-2xl shadow-sm flex items-center gap-4 border border-slate-100 dark:border-white/5 transition-opacity duration-300">
+                <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden flex items-center justify-center shrink-0">
+                    <img alt="${item.name}" class="object-contain w-full h-full p-2" src="${item.image}" />
+                </div>
+                <div class="flex-grow">
+                    <h3 class="font-semibold text-lg line-clamp-1">${item.name}</h3>
+                    <p class="text-primary font-bold mt-1">${item.price}</p>
+                </div>
+                <div class="flex flex-col items-center gap-2 bg-slate-50 dark:bg-slate-800/50 p-1 rounded-full border border-slate-100 dark:border-white/5">
+                    <button onclick="window.modCart('${item.name}', 1)" class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 shadow-sm active:scale-90 transition-transform">
+                        <span class="material-icons-round text-sm">add</span>
+                    </button>
+                    <span class="font-bold text-sm px-2 py-1">${item.quantity}</span>
+                    <button onclick="window.modCart('${item.name}', -1)" class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 shadow-sm active:scale-90 transition-transform">
+                        <span class="material-icons-round text-sm">remove</span>
+                    </button>
+                </div>
+            </div>`;
+                });
+
+                if (Object.keys(grouped).length > 0) {
+                    container.innerHTML = itemsHtml;
+                } else {
+                    container.innerHTML = '<p class="text-center text-slate-500 dark:text-slate-400 py-8" id="empty-cart-msg">Tu carrito está vacío</p>';
+                }
+
+                let formattedTotal = '$0';
+                if (total > 0) {
+                    if (isCOP || total > 1000) {
+                        formattedTotal = '$' + total.toLocaleString('es-CO');
+                    } else {
+                        formattedTotal = '$' + total.toFixed(2);
+                    }
+                }
+
+                subtotalEl.textContent = formattedTotal;
+                totalEl.textContent = formattedTotal;
+            }
+
+            render();
+
+            // Wire back button
+            const backBtn = document.querySelector('nav button');
+            if (backBtn) {
+                backBtn.addEventListener('click', () => {
+                    window.history.back();
+                });
+            }
+
+            // Wire checkout button
+            const checkoutBtn = document.querySelector('.fixed.bottom-0 button');
+            if (checkoutBtn) {
+                checkoutBtn.addEventListener('click', () => {
+                    let cart = window.CartConfig.getCart();
+                    if (cart.length > 0) {
+                        setTimeout(() => {
+                            window.location.href = '/checkout/';
+                        }, 500);
+                    } else {
+                        alert('Tu carrito está vacío');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

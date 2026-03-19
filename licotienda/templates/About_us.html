@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>LaLico - Sobre Nosotros &amp; Ubicación</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Montserrat:wght@700;900&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#39B54A",
+                        "background-light": "#F8F9FA",
+                        "background-dark": "#0A0A0A",
+                        "card-dark": "#161616",
+                        "card-light": "#FFFFFF",
+                    },
+                    fontFamily: {
+                        display: ["Montserrat", "sans-serif"],
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        .map-gradient {
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%);
+        }
+
+        .instagram-gradient {
+            background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+        }
+
+        .whatsapp-green {
+            background-color: #25D366;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0px;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans min-h-screen">
+    <div class="h-12 w-full"></div>
+    <nav class="px-6 flex items-center justify-between mb-6">
+        <button
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-card-dark shadow-sm border border-slate-200 dark:border-white/10">
+            <span class="material-icons-round text-slate-700 dark:text-white">arrow_back_ios_new</span>
+        </button>
+        <h1 class="text-xl font-bold font-display tracking-tight">Sobre Nosotros</h1>
+        <div class="w-10"></div>
+    </nav>
+    <main class="px-6 pb-12 space-y-8">
+        <div class="flex justify-center mb-4">
+            <img alt="LaLico Logo" class="h-24 w-auto drop-shadow-2xl"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeVYeEmomSK2EUiqdqTS8eqVW0fHaBfbNbKcmFIVgkNuG5UyxbDAeuoOUf1UKi3ViJYw1FLC0ahNP2i4uGmLlZSygfI72L_leRlweOqabT5pU_ndwtR63VnRLTVNcDWhU4seG4Vv2PpkCI1xXuNOCuxOyb-GPdRk-wgzecjX2Lvf9YmScFYfHaCPGuVdaTmGv5k0unVz0IvuKw1nF8HTWmOQOiOU63-eslH7QQl6Fq6V-azu9NSKLcj82VHMRVzPe8Cwk3B2WmDZk" />
+        </div>
+        <section
+            class="relative h-64 w-full rounded-3xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/5 group">
+            <div class="absolute inset-0 bg-slate-800 flex items-center justify-center">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15866.568463991873!2d-75.60830748119565!3d6.178652417750875!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e468212e694553b%3A0x8fc89d53c7c2b0cc!2sCra.%2068%20%2361-88%2C%20Itag%C3%BCi%2C%20Itag%C3%BC%C3%AD%2C%20Antioquia!5e0!3m2!1ses!2sco!4v1710000000000!5m2!1ses!2sco"
+                    class="w-full h-full opacity-60 dark:opacity-40 pointer-events-none grayscale"
+                    style="border:0; filter: grayscale(100%) invert(90%) hue-rotate(180deg);" allowfullscreen=""
+                    loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <div class="absolute inset-0 bg-primary/10 mix-blend-overlay pointer-events-none"></div>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div class="relative">
+                    <div class="absolute -inset-4 bg-primary/30 rounded-full animate-ping"></div>
+                    <div class="bg-primary p-2 rounded-full shadow-lg relative z-10">
+                        <span class="material-icons-round text-white text-3xl">location_on</span>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="absolute bottom-0 left-0 right-0 p-4 map-gradient flex items-end justify-between pointer-events-none">
+                <div class="flex flex-col">
+                    <span class="text-white/60 text-xs font-medium uppercase tracking-widest">Nuestra Sede</span>
+                    <span class="text-white font-semibold text-lg">Cra 68 #61-88</span>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Cra+68+%23+61+-+88,+Itag%C3%BCi,+Antioquia"
+                    target="_blank"
+                    class="bg-primary text-white p-3 rounded-2xl shadow-lg active:scale-95 transition-transform pointer-events-auto flex items-center justify-center">
+                    <span class="material-icons-round">directions</span>
+                </a>
+            </div>
+        </section>
+        <section class="space-y-4">
+            <div class="flex items-center gap-2">
+                <div class="h-8 w-1.5 bg-primary rounded-full"></div>
+                <h2 class="text-2xl font-bold font-display">LaLico.virtual</h2>
+            </div>
+            <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-lg">
+                Somos tu aliado perfecto para esos momentos de celebración. En <span
+                    class="text-primary font-bold">LaLico</span>, nos especializamos en llevar la mejor selección de
+                licores y snacks directamente a tu puerta, con la rapidez y confianza que te mereces.
+            </p>
+            <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                Nuestra pasión es facilitar tus brindis, ofreciendo siempre productos de calidad y un servicio al
+                cliente excepcional. ¡Salud por los buenos momentos!
+            </p>
+        </section>
+        <section
+            class="bg-white dark:bg-card-dark p-6 rounded-3xl border border-slate-100 dark:border-white/5 shadow-sm">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                    <span class="material-icons-round text-primary">schedule</span>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg">Horarios de Atención</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Listos para tu pedido</p>
+                </div>
+            </div>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-white/5">
+                    <span class="text-slate-600 dark:text-slate-300 font-medium">Jueves a Domingo</span>
+                    <span class="text-primary font-bold">4:00 PM - 12:00 PM</span>
+                </div>
+                <div class="flex justify-between items-center py-2 opacity-50">
+                    <span class="text-slate-600 dark:text-slate-300">Lunes a Miércoles</span>
+                    <span class="italic text-sm">Cerrado</span>
+                </div>
+            </div>
+        </section>
+        <section class="space-y-4">
+            <h3 class="text-lg font-bold font-display px-1">Conéctate con nosotros</h3>
+            <div class="grid grid-cols-1 gap-4">
+                <button
+                    class="instagram-gradient w-full p-4 rounded-3xl flex items-center justify-between text-white shadow-lg active:scale-[0.98] transition-all">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                            <svg class="w-7 h-7 fill-white" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849s-.011 3.584-.069 4.849c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.849-.07c-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849s.012-3.584.07-4.849c.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.358-.2 6.78-2.618 6.98-6.98.058-1.281.072-1.689.072-4.948s-.014-3.667-.072-4.947c-.2-4.358-2.618-6.78-6.98-6.98-1.28-.058-1.689-.072-4.948-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="text-left">
+                            <span class="block text-sm opacity-80">Síguenos</span>
+                            <span class="font-bold text-lg">Instagram</span>
+                        </div>
+                    </div>
+                    <span class="material-icons-round">open_in_new</span>
+                </button>
+                <button
+                    class="whatsapp-green w-full p-4 rounded-3xl flex items-center justify-between text-white shadow-lg active:scale-[0.98] transition-all">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                            <svg class="w-7 h-7 fill-white" viewBox="0 0 24 24">
+                                <path
+                                    d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.483 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.308 1.656zm6.757-4.242c1.448.859 3.12 1.314 4.826 1.315 5.229 0 9.482-4.253 9.485-9.486.002-2.534-1.006-4.915-2.841-6.751-1.835-1.835-4.215-2.844-6.748-2.846-5.23 0-9.482 4.253-9.485 9.486-.002 1.77.464 3.491 1.352 5.013l-1.021 3.731 3.832-.991zm11.049-5.147c-.3-.15-1.772-.874-2.046-.974-.275-.1-.475-.15-.675.15s-.775.974-.95 1.174-.35.225-.65.075c-.3-.15-1.264-.466-2.408-1.485-.89-.793-1.491-1.773-1.666-2.074-.175-.3-.018-.462.13-.611.134-.133.3-.35.45-.525.15-.175.2-.3.3-.5s.05-.375-.025-.525-.675-1.625-.925-2.225c-.244-.588-.491-.508-.675-.517-.175-.008-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.9 1.225 3.1c.15.2 2.116 3.231 5.126 4.531.716.31 1.274.495 1.708.633.719.228 1.374.196 1.891.119.577-.085 1.772-.724 2.022-1.424.25-.7.25-1.3.175-1.425-.075-.125-.275-.2-.575-.35z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="text-left">
+                            <span class="block text-sm opacity-80">Escríbenos</span>
+                            <span class="font-bold text-lg">WhatsApp</span>
+                        </div>
+                    </div>
+                    <span class="material-icons-round">chat_bubble</span>
+                </button>
+            </div>
+        </section>
+        <footer class="text-center pt-4 pb-8">
+            <p class="text-slate-400 dark:text-slate-600 text-xs font-medium uppercase tracking-[0.2em]">
+                LaLico © 2024 • Bogota, Colombia
+            </p>
+        </footer>
+    </main>
+    <div
+        class="fixed bottom-0 left-0 right-0 h-20 bg-white/80 dark:bg-card-dark/80 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 px-8 flex items-center justify-between z-50">
+        <button class="flex flex-col items-center gap-1 text-slate-400">
+            <span class="material-icons-round">home</span>
+            <span class="text-[10px] font-bold">INICIO</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-slate-400">
+            <span class="material-icons-round">shopping_bag</span>
+            <span class="text-[10px] font-bold">TIENDA</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-primary">
+            <span class="material-icons-round">info</span>
+            <span class="text-[10px] font-bold">INFO</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-slate-400">
+            <span class="material-icons-round">person</span>
+            <span class="text-[10px] font-bold">PERFIL</span>
+        </button>
+    </div>
+
+</body>
+
+</html>

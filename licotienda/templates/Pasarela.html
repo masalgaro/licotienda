@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Payment Gateway - LaLico</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#32C14D",
+                        "background-dark": "#0A0A0A",
+                        "card-dark": "#171717",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #32C14D;
+            box-shadow: 0 0 0 2px rgba(50, 193, 77, 0.2);
+            outline: none;
+        }
+        .credit-card-gradient {
+            background: linear-gradient(135deg, #1e1e1e 0%, #111111 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .animate-glow-button {
+            box-shadow: 0 0 15px 2px rgba(50, 193, 77, 0.3);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background-dark text-slate-100 min-h-screen flex flex-col">
+    <nav
+        class="sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md px-4 pt-12 pb-4 flex items-center justify-between">
+        <button class="p-2 rounded-full hover:bg-slate-800 transition-colors">
+            <span class="material-symbols-outlined align-middle">arrow_back_ios_new</span>
+        </button>
+        <h1 class="text-xl font-bold tracking-tight">Payment Details</h1>
+        <div class="w-10"></div>
+    </nav>
+    <main class="flex-grow px-4 pb-40">
+        <div class="mt-6 text-center">
+            <p class="text-slate-400 text-sm font-medium uppercase tracking-widest mb-1">Total a pagar</p>
+            <h2 class="text-4xl font-black text-primary tracking-tight" id="checkout-total">$0</h2>
+        </div>
+        <div class="mt-10 space-y-4">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 px-1">Método de Pago</h3>
+            <div class="flex gap-3 overflow-x-auto hide-scrollbar py-2">
+                <div class="shrink-0 w-40 p-4 rounded-2xl bg-primary/10 border-2 border-primary">
+                    <span class="material-symbols-outlined text-primary mb-2">credit_card</span>
+                    <p class="font-bold text-sm">Tarjeta</p>
+                </div>
+                <div class="shrink-0 w-40 p-4 rounded-2xl bg-card-dark border border-white/5 opacity-60">
+                    <span class="material-symbols-outlined text-slate-400 mb-2">account_balance</span>
+                    <p class="font-bold text-sm">Transferencia</p>
+                </div>
+                <div class="shrink-0 w-40 p-4 rounded-2xl bg-card-dark border border-white/5 opacity-60">
+                    <span class="material-symbols-outlined text-slate-400 mb-2">payments</span>
+                    <p class="font-bold text-sm">Efectivo</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-8">
+            <div class="credit-card-gradient w-full aspect-[1.6/1] rounded-3xl p-6 relative overflow-hidden shadow-2xl">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
+                <div class="flex justify-between items-start">
+                    <div
+                        class="w-12 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center border border-yellow-500/30">
+                        <div class="w-8 h-6 bg-yellow-500/40 rounded-md"></div>
+                    </div>
+                    <span class="material-symbols-outlined text-3xl opacity-40">contactless</span>
+                </div>
+                <div class="mt-8">
+                    <p class="text-xl tracking-[0.2em] font-medium text-slate-200">015-466-608-73 - AHORROS BANCOLOMBIA
+                    </p>
+                </div>
+                <div class="mt-auto flex justify-between items-end absolute bottom-6 left-6 right-6">
+                    <div>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest">Titular</p>
+                        <p class="font-semibold text-sm">JUAN PEREZ</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest text-right">Expira</p>
+                        <p class="font-semibold text-sm">12/26</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-8 space-y-4">
+            <div>
+                <label class="text-xs font-bold text-slate-500 ml-1 mb-1.5 block">Nombre en la tarjeta</label>
+                <input
+                    class="w-full glass-input rounded-2xl px-4 py-4 text-white placeholder:text-slate-600 focus:ring-0"
+                    placeholder="Como aparece en el plástico" type="text" />
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-500 ml-1 mb-1.5 block">Número de tarjeta</label>
+                <div class="relative">
+                    <input
+                        class="w-full glass-input rounded-2xl px-4 py-4 text-white placeholder:text-slate-600 focus:ring-0"
+                        placeholder="0000 0000 0000 0000" type="text" />
+                    <span
+                        class="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500">lock</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-500 ml-1 mb-1.5 block">Fecha de exp.</label>
+                    <input
+                        class="w-full glass-input rounded-2xl px-4 py-4 text-white placeholder:text-slate-600 focus:ring-0"
+                        placeholder="MM/YY" type="text" />
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 ml-1 mb-1.5 block">CVC</label>
+                    <input
+                        class="w-full glass-input rounded-2xl px-4 py-4 text-white placeholder:text-slate-600 focus:ring-0"
+                        placeholder="123" type="text" />
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 ml-1 mb-1.5 block">Detalles de la direccion</label>
+                    <input
+                        class="w-full glass-input rounded-2xl px-4 py-4 text-white placeholder:text-slate-600 focus:ring-0"
+                        placeholder="Detalles de la direccion de entrega" type="text" />
+                </div>
+            </div>
+            <div class="flex items-center gap-2 px-1 pt-2">
+                <input
+                    class="rounded border-white/10 bg-white/5 text-primary focus:ring-primary focus:ring-offset-background-dark"
+                    id="save-card" type="checkbox" />
+                <label class="text-xs text-slate-400" for="save-card">Guardar tarjeta para futuras compras</label>
+            </div>
+        </div>
+    </main>
+    <div
+        class="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background-dark via-background-dark/95 to-transparent pb-10">
+        <div class="flex items-center justify-center gap-2 mb-4">
+            <span class="material-symbols-outlined text-primary text-sm">verified_user</span>
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">Pago encriptado y seguro SSL
+            </p>
+        </div>
+        <button id="pay-btn"
+            class="w-full bg-primary text-white py-5 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-2 animate-glow-button transition-all duration-300 active:scale-95 group">
+            <span id="pay-text">Confirmar Pedido</span>
+            <span class="material-symbols-outlined" id="pay-icon">shield</span>
+        </button>
+    </div>
+    <div class="fixed -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px] -z-10"></div>
+    <div class="fixed bottom-32 -left-24 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -z-10"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set total dynamically
+            const storedTotal = localStorage.getItem('lalico_total');
+            if (storedTotal) {
+                document.getElementById('checkout-total').textContent = storedTotal;
+            }
+
+            // Handle Pay Button
+            const payBtn = document.getElementById('pay-btn');
+            const payText = document.getElementById('pay-text');
+            const payIcon = document.getElementById('pay-icon');
+
+            payBtn.addEventListener('click', () => {
+                // Simulate loading
+                payText.textContent = "Procesando...";
+                payIcon.textContent = "sync";
+                payIcon.classList.add("animate-spin");
+                payBtn.classList.add("opacity-80", "pointer-events-none");
+
+                setTimeout(() => {
+                    // Success
+                    payIcon.classList.remove("animate-spin");
+                    payIcon.textContent = "check_circle";
+                    payText.textContent = "¡Pago Exitoso!";
+                    payBtn.classList.remove("opacity-80");
+                    payBtn.classList.add("bg-green-600");
+
+                    // Clear Cart locally
+                    localStorage.removeItem('lalico_cart');
+                    localStorage.removeItem('lalico_total');
+
+                    setTimeout(() => {
+                        alert('Tu pedido ha sido procesado con éxito. ¡Gracias por comprar en LaLico!');
+                        window.location.href = '/';
+                    }, 500);
+
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+
+</html>

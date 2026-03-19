@@ -1,0 +1,285 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>LaLico - Licores &amp; Snacks</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#36c43f",
+                        "primary-dark": "#41a937",
+                        "background-light": "#f8f9fa",
+                        "background-dark": "#0a0a0a",
+                        "card-dark": "#1a1a1a",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen">
+    <header
+        class="sticky top-0 z-50 px-5 pt-12 pb-4 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                    <img alt="LaLico Logo" class="w-8 h-8 object-contain"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpO8jRmOfi94EA1Ux4jfhSsgrBKdd1j5_DKKGhNwpGsiAE6GyCl51yLpu4EvC6wP2s84CG_wke2-H4IYEOyEYzp0b25hob5QUxkWoEhHzBhJXivyc4hD1HgdmEy_uoHz8D9Iseo7yeQI00Ch2j_3D_A12uXgVRdw3rY6nJYuwGUtwXuBLeq0JWzGb2d5kn8lCCZaK8zvaggnyYUB8Mg2LljqQG7zkZfZo0rJeQ9fRkh27mgOHwlzNAyqmdE_lSM-ZRSTGkjKP7N0g" />
+                </div>
+                <div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap" id="greeting-text">Entregar en</p>
+                    <div class="flex items-center gap-1">
+                        <span class="text-sm font-bold truncate max-w-[120px]" id="greeting-name">Calle Principal #123</span>
+                        <span class="material-icons-round text-primary text-sm">expand_more</span>
+                    </div>
+                </div>
+            </div>
+            <button class="relative p-2 rounded-full bg-slate-100 dark:bg-card-dark">
+                <span class="material-icons-round">notifications</span>
+                <span
+                    class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-white dark:border-background-dark"></span>
+            </button>
+        </div>
+        <div class="mt-4 relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 material-icons-round text-slate-400">search</span>
+            <input id="search-input"
+                class="w-full bg-slate-100 dark:bg-card-dark border-none rounded-2xl py-3.5 pl-12 pr-4 focus:ring-2 focus:ring-primary text-sm"
+                placeholder="¿Qué te apetece hoy?" type="text" />
+        </div>
+    </header>
+    <main class="px-5 pb-32">
+        <section class="mt-6">
+            <div class="relative overflow-hidden rounded-3xl h-48 bg-primary">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent z-10"></div>
+                <img alt="Cheers with drinks" class="absolute inset-0 w-full h-full object-cover"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_IDDopjF9156moXWlLH7G-y8tgJ1e9-mYPiS-a9JW6RM3aRV9RZoEzxD5vaKXfhNw9lhVHwygvTzn6U2OZ6IvqSx0wDmkQHRKCro_Xi6lKLDBaf5SY_8qMWreVf-1MpIkf7DDibV0OUpAtEqro94JUbfD4O-iC8gTrSFR00FpdB7T7l7udhU4t2PoUM0OK6Ji8s47cHA_oW44lyeUx4Dk9ETW63pHHaW4NDOkWpOIPXpYJuSJMisZY5QuM1XQdNuw5-tw3M88Bv0" />
+                <div class="relative z-20 p-6 flex flex-col justify-center h-full max-w-[60%]">
+                    <h2 class="text-2xl font-extrabold text-white leading-tight">¡Viernes de Licores!</h2>
+                    <p class="text-white/80 text-sm mt-1">20% OFF en Smirnoff &amp; Snacks seleccionados</p>
+                    <button
+                        class="mt-4 bg-white text-black text-xs font-extrabold px-4 py-2 rounded-full w-fit uppercase tracking-wider">
+                        Pedir Ahora
+                    </button>
+                </div>
+            </div>
+        </section>
+        <section class="mt-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold">Categorías</h3>
+                <button class="text-primary text-sm font-semibold">Ver todas</button>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div
+                    class="bg-card-dark rounded-2xl p-4 h-36 flex flex-col justify-between relative overflow-hidden group">
+                    <div class="z-10">
+                        <span class="text-white font-bold text-lg block">Licores</span>
+                        <span class="text-primary text-xs font-medium">Premium</span>
+                    </div>
+                    <span
+                        class="material-icons-round absolute -right-4 -bottom-4 text-7xl text-white/5 rotate-12 group-hover:scale-110 transition-transform">liquor</span>
+                    <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center z-10">
+                        <span class="material-icons-round text-white">liquor</span>
+                    </div>
+                </div>
+                <div
+                    class="bg-card-dark rounded-2xl p-4 h-36 flex flex-col justify-between relative overflow-hidden group">
+                    <div class="z-10">
+                        <span class="text-white font-bold text-lg block">Snacks</span>
+                        <span class="text-primary text-xs font-medium">Crujientes</span>
+                    </div>
+                    <span
+                        class="material-icons-round absolute -right-4 -bottom-4 text-7xl text-white/5 rotate-12 group-hover:scale-110 transition-transform">restaurant</span>
+                    <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center z-10">
+                        <span class="material-icons-round text-white">restaurant</span>
+                    </div>
+                </div>
+                <div
+                    class="bg-card-dark rounded-2xl p-4 h-36 flex flex-col justify-between relative overflow-hidden group">
+                    <div class="z-10">
+                        <span class="text-white font-bold text-lg block">Aguardiente</span>
+                        <span class="text-primary text-xs font-medium">Refrescantes</span>
+                    </div>
+                    <span
+                        class="material-icons-round absolute -right-4 -bottom-4 text-7xl text-white/5 rotate-12 group-hover:scale-110 transition-transform">icecream</span>
+                    <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center z-10">
+                        <span class="material-icons-round text-white">icecream</span>
+                    </div>
+                </div>
+                <div
+                    class="bg-card-dark rounded-2xl p-4 h-36 flex flex-col justify-between relative overflow-hidden group">
+                    <div class="z-10">
+                        <span class="text-white font-bold text-lg block">Rones</span>
+                        <span class="text-primary text-xs font-medium">Complementos</span>
+                    </div>
+                    <span
+                        class="material-icons-round absolute -right-4 -bottom-4 text-7xl text-white/5 rotate-12 group-hover:scale-110 transition-transform">more_horiz</span>
+                    <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center z-10">
+                        <span class="material-icons-round text-white">shopping_bag</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="mt-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold">Tendencia Ahora</h3>
+                <span class="flex items-center gap-1 text-primary text-xs font-bold bg-primary/10 px-2 py-1 rounded-md">
+                    <span class="material-icons-round text-sm">local_fire_department</span>
+                    HOT
+                </span>
+            </div>
+            <div class="flex gap-4 overflow-x-auto hide-scrollbar -mx-5 px-5" id="trending-container">
+                {% for product in products %}
+                <div class="min-w-[160px] bg-card-dark rounded-2xl p-3 flex flex-col group transition-opacity duration-300">
+                    <div class="relative h-32 rounded-xl bg-slate-800/50 flex items-center justify-center mb-3">
+                        <img alt="{{ product.name }}" class="h-28 object-contain" src="{{ product.image_url }}" />
+                        <button class="absolute top-2 right-2 w-7 h-7 bg-white/10 backdrop-blur rounded-full flex items-center justify-center">
+                            <span class="material-icons-round text-sm text-white">favorite_border</span>
+                        </button>
+                    </div>
+                    <span class="text-sm font-bold truncate">{{ product.name }}</span>
+                    <span class="text-xs text-slate-400 mt-1">{{ product.category }}</span>
+                    <div class="flex items-center justify-between mt-3">
+                        <span class="text-primary font-bold">${{ product.price|floatformat:0 }}</span>
+                        <button class="bg-primary p-1.5 rounded-lg">
+                            <span class="material-icons-round text-white text-sm">add</span>
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-slate-500 font-medium">No hay tendencias en este momento.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+    <nav
+        class="fixed bottom-0 left-0 right-0 bg-background-light dark:bg-card-dark/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 px-6 pb-8 pt-4 z-50">
+        <div class="flex items-center justify-between max-w-lg mx-auto">
+            <button class="flex flex-col items-center gap-1 text-primary">
+                <span class="material-icons-round">home</span>
+                <span class="text-[10px] font-bold">Inicio</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-slate-400">
+                <span class="material-icons-round">explore</span>
+                <span class="text-[10px] font-medium">Explorar</span>
+            </button>
+            <button class="relative -top-10">
+                <div
+                    class="w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30 border-4 border-background-light dark:border-background-dark">
+                    <span class="material-icons-round text-white text-3xl">shopping_cart</span>
+                </div>
+                <div
+                    class="absolute -top-1 -right-1 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white border-2 border-background-light dark:border-background-dark">
+                    2
+                </div>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-slate-400">
+                <span class="material-icons-round">favorite</span>
+                <span class="text-[10px] font-medium">Favoritos</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-slate-400">
+                <span class="material-icons-round">person</span>
+                <span class="text-[10px] font-medium">Perfil</span>
+            </button>
+        </div>
+    </nav>
+    <div class="fixed top-0 left-0 w-full h-full pointer-events-none -z-10">
+        <div class="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full"></div>
+    </div>
+
+    <!-- User Profile Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userDataStr = localStorage.getItem('lalico_user');
+            if(userDataStr) {
+                try {
+                    const userData = JSON.parse(userDataStr);
+                    if(userData && userData.isLoggedIn) {
+                        const greetingText = document.getElementById('greeting-text');
+                        const greetingName = document.getElementById('greeting-name');
+                        if (greetingText) greetingText.textContent = "Hola, 👋";
+                        if (greetingName) {
+                            greetingName.textContent = userData.name;
+                            greetingName.nextElementSibling.style.display = 'none'; // hide the expand_more arrow
+                        }
+                    }
+                } catch(e) {
+                    console.error("No valid user data found.");
+                }
+            }
+        });
+    </script>
+
+    <!-- Search Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search-input');
+            const trendingContainer = document.getElementById('trending-container');
+            if (searchInput && trendingContainer) {
+                const items = trendingContainer.querySelectorAll('.group');
+                searchInput.addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    items.forEach(item => {
+                        const title = item.querySelector('.truncate').textContent.toLowerCase();
+                        if (title.includes(term)) {
+                            item.style.display = 'flex';
+                            setTimeout(() => item.style.opacity = '1', 50);
+                        } else {
+                            item.style.opacity = '0';
+                            setTimeout(() => item.style.display = 'none', 300);
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+
+    <!-- Importa el script del carrito -->
+    <script src="{% static 'cart.js' %}"></script>
+</body>
+
+</html>

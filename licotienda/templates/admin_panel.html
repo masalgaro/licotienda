@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Admin Dashboard - LaLico</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <script>
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#36c43f", "background-dark": "#0a0a0a", "card-dark": "#1a1a1a" } } } };
+    </script>
+</head>
+<body class="bg-background-dark text-white min-h-screen p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">Panel Administrativo</h1>
+            <a href="{% url 'product_create' %}" class="bg-primary text-white px-6 py-2 rounded-xl font-bold hover:bg-green-600 transition">
+                + Nuevo Producto
+            </a>
+        </div>
+
+        <div class="bg-card-dark rounded-3xl overflow-hidden border border-white/10 shadow-xl">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-white/10 text-slate-400 text-sm uppercase tracking-wider">
+                        <th class="p-4 font-semibold">Producto</th>
+                        <th class="p-4 font-semibold">Precio</th>
+                        <th class="p-4 font-semibold">Categoría</th>
+                        <th class="p-4 font-semibold">Estado</th>
+                        <th class="p-4 font-semibold text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/10">
+                    {% for product in products %}
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="p-4 flex items-center gap-3">
+                            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="w-12 h-12 rounded-lg object-contain bg-slate-800 p-1">
+                            <span class="font-bold">{{ product.name }}</span>
+                        </td>
+                        <td class="p-4 text-primary font-bold">${{ product.price|floatformat:0 }}</td>
+                        <td class="p-4 text-slate-300">{{ product.category }}</td>
+                        <td class="p-4">
+                            {% if product.is_active %}
+                                <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-bold rounded-md uppercase tracking-wider">Disponible</span>
+                            {% else %}
+                                <span class="px-2 py-1 bg-red-500/20 text-red-400 text-xs font-bold rounded-md uppercase tracking-wider">Agotado</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-4 text-right space-x-2">
+                            <a href="{% url 'product_edit' product.pk %}" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg material-icons-round text-sm transition">edit</a>
+                            <a href="{% url 'product_delete' product.pk %}" class="p-2 bg-red-900/50 hover:bg-red-800 text-red-300 rounded-lg material-icons-round text-sm transition">delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="p-8 text-center text-slate-500 font-medium">No hay productos en el inventario.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-8 text-center">
+            <a href="{% url 'store' %}" class="text-primary hover:underline font-medium">← Volver a la Tienda</a>
+        </div>
+    </div>
+</body>
+</html>

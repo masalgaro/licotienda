@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>LaLico - Login</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <style type="text/tailwindcss">
+        :root {
+            --primary: #32C14D;
+            --background-dark: #0A0A0A;
+            --card-dark: #171717;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background-color: var(--background-dark);
+        }
+        .ios-input-shadow {
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="text-slate-100 min-h-screen flex flex-col justify-between overflow-hidden">
+    <div class="fixed -top-24 -right-24 w-80 h-80 bg-[var(--primary)]/10 rounded-full blur-[100px] -z-10"></div>
+    <div class="fixed -bottom-24 -left-24 w-80 h-80 bg-[var(--primary)]/5 rounded-full blur-[100px] -z-10"></div>
+    <main class="flex-grow flex flex-col items-center px-8 pt-24">
+        <div class="mb-16 text-center">
+            <div
+                class="w-24 h-24 bg-[var(--primary)] rounded-[2rem] flex items-center justify-center mb-6 shadow-2xl shadow-[var(--primary)]/20 mx-auto">
+                <span class="material-symbols-outlined text-white text-5xl font-bold">local_bar</span>
+            </div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white">LaLico<span
+                    class="text-[var(--primary)]">.virtual</span></h1>
+            <p class="text-slate-400 mt-2 font-medium">Licores y snacks a tu puerta</p>
+        </div>
+        <div class="w-full max-w-sm space-y-4">
+            <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest ml-1"
+                    for="email">Email</label>
+                <div class="relative">
+                    <span
+                        class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl">mail</span>
+                    <input
+                        class="w-full bg-[var(--card-dark)] border-slate-800 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 transition-all ios-input-shadow"
+                        id="email" placeholder="tu@email.com" type="email" />
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest ml-1"
+                    for="password">Contraseña</label>
+                <div class="relative">
+                    <span
+                        class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl">lock</span>
+                    <input
+                        class="w-full bg-[var(--card-dark)] border-slate-800 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 transition-all ios-input-shadow"
+                        id="password" placeholder="••••••••" type="password" />
+                    <button class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
+                        <span class="material-symbols-outlined text-xl">visibility</span>
+                    </button>
+                </div>
+            </div>
+            <div class="flex justify-end pt-1">
+                <a class="text-sm font-semibold text-white/80 hover:text-[var(--primary)] transition-colors"
+                    href="#">¿Olvidaste tu contraseña?</a>
+            </div>
+            <button id="login-btn"
+                class="w-full bg-[var(--primary)] text-white py-5 rounded-2xl font-extrabold text-lg shadow-xl shadow-[var(--primary)]/20 active:scale-95 transition-transform mt-8">
+                Iniciar Sesión
+            </button>
+        </div>
+    </main>
+    <footer class="p-8 text-center">
+        <p class="text-slate-400">
+            ¿No tienes cuenta?
+            <a class="text-white font-bold ml-1 border-b border-white/20 pb-0.5" href="#">Crear cuenta</a>
+        </p>
+    </footer>
+    <div class="h-8"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginBtn = document.getElementById('login-btn');
+            
+            loginBtn.addEventListener('click', () => {
+                // In a real app we'd validate, here we just simulate successful login
+                const emailInput = document.getElementById('email').value;
+                let username = "Invitado";
+                if(emailInput) {
+                    username = emailInput.split('@')[0];
+                    // Capitalize first letter
+                    username = username.charAt(0).toUpperCase() + username.slice(1);
+                } else {
+                    username = "Juan"; // Default fallback
+                }
+
+                // Save to simulated session
+                localStorage.setItem('lalico_user', JSON.stringify({
+                    isLoggedIn: true,
+                    name: username
+                }));
+
+                // Para demo, siempre dejar entrar
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+
+</html>

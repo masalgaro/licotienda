@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>LaLico - Licores &amp; Snacks</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#32BD49",
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#0A0A0A",
+                        "card-dark": "#171717",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "16px",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .ios-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .add-btn-pop:active {
+            transform: scale(0.9);
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-300">
+    <div class="h-11 w-full bg-background-light dark:bg-background-dark sticky top-0 z-50"></div>
+    <nav
+        class="sticky top-11 z-50 px-5 py-3 flex items-center justify-between bg-background-light/80 dark:bg-background-dark/80 ios-blur">
+        <div class="flex items-center gap-4">
+            <button
+                class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-neutral-800 active:opacity-60 transition-opacity">
+                <span class="material-icons-round">arrow_back_ios_new</span>
+            </button>
+            <h1 class="text-xl font-bold tracking-tight">Licores</h1>
+        </div>
+        <div class="flex items-center gap-2">
+            <button
+                class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-neutral-800 active:opacity-60 transition-opacity">
+                <span class="material-icons-round">tune</span>
+            </button>
+            <button
+                class="relative w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-neutral-800 active:opacity-60 transition-opacity">
+                <span class="material-icons-round">shopping_cart</span>
+                <span
+                    class="absolute top-1 right-1 w-4 h-4 bg-primary text-[10px] font-bold text-white rounded-full flex items-center justify-center">3</span>
+            </button>
+        </div>
+    </nav>
+    <div class="px-5 py-4">
+        <div class="bg-black rounded-2xl p-4 flex items-center justify-center border border-white/5">
+            <img alt="LaLico Logo" class="h-20 object-contain"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuQc3HlyttiwwCCXeXyirP3YbN6Jsw-Hn65rqG72dT17Dp1d9llZnDXFkooKHn0Ci1XLNzPtue3TSsCzDRID7rZDtEoP-H_Holbo_avbnKAAg79Ou7s1CQDFznUEQ1-190R6Bt7PGE-lVuo58u9yfwmwbTNMfbjFbqfYxY6MPO9uciTyVB0RK6j70ew9zcwRsz1oc1al6Ef_UIdwGzhkDllbz927R-ZJNPI7fn-w91su_7wUCCjuSXtJaH8jpc3LtzJfvfK0bOW70" />
+        </div>
+    </div>
+    <div class="flex overflow-x-auto px-5 py-2 gap-3 hide-scrollbar" id="category-filters">
+        <button data-target="Todos"
+            class="px-6 py-2 rounded-full bg-primary text-white font-semibold text-sm whitespace-nowrap shadow-lg shadow-primary/20 transition-colors">Todos</button>
+        <button data-target="Licores"
+            class="px-6 py-2 rounded-full bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 font-medium text-sm whitespace-nowrap transition-colors">Licores</button>
+        <button data-target="Snacks"
+            class="px-6 py-2 rounded-full bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 font-medium text-sm whitespace-nowrap transition-colors">Snacks</button>
+        <button data-target="Aguardiente"
+            class="px-6 py-2 rounded-full bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 font-medium text-sm whitespace-nowrap transition-colors">Aguardiente</button>
+        <button data-target="Rones"
+            class="px-6 py-2 rounded-full bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 font-medium text-sm whitespace-nowrap transition-colors">Rones</button>
+        <button data-target="Cervezas"
+            class="px-6 py-2 rounded-full bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 font-medium text-sm whitespace-nowrap transition-colors">Cervezas</button>
+    </div>
+    <div class="px-5 py-6 grid grid-cols-2 gap-4 pb-32" id="store-products-grid">
+        {% for product in products %}
+        <div data-category="{{ product.category }}"
+            class="bg-white dark:bg-card-dark rounded-2xl p-2.5 shadow-sm border border-slate-100 dark:border-neutral-800 flex flex-col relative group transition-opacity duration-300">
+            <div class="h-32 rounded-xl bg-neutral-100 dark:bg-neutral-900 overflow-hidden mb-2 relative">
+                <img alt="{{ product.name }}" class="w-full h-full object-cover" src="{{ product.image_url }}" />
+            </div>
+            <div class="flex flex-col flex-grow">
+                <span class="text-[10px] text-slate-400 dark:text-neutral-500 font-medium mb-0.5 uppercase tracking-wide">{{ product.category }}</span>
+                <h3 class="font-bold text-xs leading-tight mb-2 dark:text-white line-clamp-2">{{ product.name }}</h3>
+                <div class="flex items-center justify-between mt-auto">
+                    <span class="text-primary font-extrabold text-base">${{ product.price|floatformat:0 }}</span>
+                    <button class="add-btn-pop w-8 h-8 bg-primary hover:bg-green-500 text-white rounded-xl flex items-center justify-center transition-all duration-200 shadow-md shadow-primary/30">
+                        <span class="material-icons-round text-sm">add</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="col-span-2 text-center text-slate-500 mt-10 font-medium font-semibold text-lg">Aún no hay productos en inventario.</p>
+        {% endfor %}
+    </div>
+    <div
+        class="fixed bottom-0 left-0 right-0 z-50 px-6 pb-8 pt-4 bg-white/90 dark:bg-background-dark/90 ios-blur border-t border-slate-200 dark:border-neutral-800">
+        <div class="flex items-center justify-between max-w-md mx-auto">
+            <button class="flex flex-col items-center gap-1 text-primary">
+                <span class="material-icons-round text-2xl">home</span>
+                <span class="text-[10px] font-bold">Inicio</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-slate-400 dark:text-neutral-500">
+                <span class="material-icons-round text-2xl">search</span>
+                <span class="text-[10px] font-medium">Buscar</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-slate-400 dark:text-neutral-500">
+                <span class="material-icons-round text-2xl">history</span>
+                <span class="text-[10px] font-medium">Pedidos</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-slate-400 dark:text-neutral-500">
+                <span class="material-icons-round text-2xl">info</span>
+                <span class="text-[10px] font-medium">Info</span>
+            </button>
+        </div>
+    </div>
+    <div class="fixed bottom-24 right-5 left-5 z-40 animate-bounce duration-1000">
+        <button
+            class="w-full bg-primary text-white py-4 rounded-2xl flex items-center justify-between px-6 shadow-2xl shadow-primary/40 active:scale-[0.98] transition-transform">
+            <div class="flex items-center gap-3">
+                <span class="material-icons-round">shopping_bag</span>
+                <span class="font-bold">Ver mi carrito (3)</span>
+            </div>
+            <span class="font-extrabold text-lg">$65.49</span>
+        </button>
+    </div>
+
+    <!-- User Profile Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userDataStr = localStorage.getItem('lalico_user');
+            if(userDataStr) {
+                try {
+                    const userData = JSON.parse(userDataStr);
+                    if(userData && userData.isLoggedIn) {
+                        const greetingText = document.getElementById('greeting-text');
+                        const greetingName = document.getElementById('greeting-name');
+                        if (greetingText) greetingText.textContent = "Hola, 👋";
+                        if (greetingName) {
+                            greetingName.textContent = userData.name;
+                            greetingName.nextElementSibling.style.display = 'none'; // hide the expand_more arrow
+                        }
+                    }
+                } catch(e) {
+                    console.error("No valid user data found.");
+                }
+            }
+        });
+    </script>
+
+    <!-- Importa el script del carrito -->
+    <script src="{% static 'cart.js' %}"></script>
+</body>
+
+</html>
