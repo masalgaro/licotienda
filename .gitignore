@@ -8,4 +8,13 @@
 /.idea
 /.fleet
 /.nova
-
+# Cache and other Django specific stuff
+__pycache__/ 
+*.log
+*.pot
+*.pyc 
+local_settings.py
+pip-log.txt
+pip-delete-this-directory.txt
+# Database
+db.sqlite3
