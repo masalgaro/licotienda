@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'corsheaders',
     'usuarios',
     'soporte',
     'ventas',
@@ -47,9 +48,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -138,6 +140,12 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ]
 }
+
+# Configuración de CORS (Cross Origin Resource Sharing) para requests entre frontend y backend.
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173", # Puerto por defecto de Vite.
+    # Podríamos agregar otras URLs aquí en caso de ser necesario.
+]
 
 from datetime import timedelta
 SIMPLE_JWT = {

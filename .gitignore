@@ -9,7 +9,7 @@
 /.fleet
 /.nova
 # Cache and other Django specific stuff
-__pycache__/ 
+/__pycache__/ 
 *.log
 *.pot
 *.pyc 
