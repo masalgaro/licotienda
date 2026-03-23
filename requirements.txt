@@ -1,0 +1,31 @@
+# Backend Requirements - La Lico [Refactorizado]
+# Fecha: 23 de Marzo 2026
+
+# Nucleo Django
+Django==6.0.3
+asgiref==3.11.1
+sqlparse==0.5.5
+tzdata==2025.3
+
+# API & Seguridad
+djangorestframework==3.16.1
+django-cors-headers==4.9.0
+djangorestframework_simplejwt==5.5.1
+PyJWT==2.12.1
+
+# Procesamiento de Imagenes (Comprobantes de Pago)
+Pillow==12.1.1
+
+# Utilidades y Estructura
+packaging==26.0
+pyparsing==3.3.2
+six==1.17.0
+
+# Soporte Cientifico / Datos (Catalogo Avanzado)
+numpy==2.4.3
+scipy==1.17.1
+joblib==1.5.3
+threadpoolctl==3.6.0
+cycler==0.12.1
+fonttools==4.62.1
+kiwisolver==1.5.0

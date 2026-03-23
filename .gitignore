@@ -1,0 +1,34 @@
+<<<<<<< HEAD
+# Virtual Environments
+/venv
+/env 
+/.env 
+/.venv 
+# IDE stuff
+/.vscode
+/.idea
+/.fleet
+/.nova
+# Cache and other Django specific stuff
+/__pycache__/ 
+*.log
+*.pot
+*.pyc 
+local_settings.py
+pip-log.txt
+pip-delete-this-directory.txt
+# Database
+=======
+.venv/
+__pycache__/
+*.pyc
+>>>>>>> 0ec47202859d9d7a7d832642febbb4247495cc74
+db.sqlite3
+.DS_Store
+staticfiles/
+media/
+CLAUDE.md
+.claude
+.agent
+.agents
+.vscode

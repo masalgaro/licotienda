@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;600&display=swap');
+
+:root {
+  /* Colors */
+  --bg-black: #000000;
+  --surface-dim: #0e0e0e;
+  --surface-1: #131313;
+  --surface-2: #191919;
+  --surface-3: #262626;
+  
+  --primary-green: #39B54A;
+  --primary-glow: rgba(57, 181, 74, 0.4);
+  --text-primary: #ffffff;
+  --text-secondary: #ababab;
+  --error-oxblood: #d53d18;
+
+  /* Typography */
+  --font-display: 'Noto Serif', serif;
+  --font-body: 'Manrope', sans-serif;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(18, 18, 18, 0.7);
+  --glass-border: rgba(57, 181, 74, 0.1);
+  --glass-blur: blur(20px);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-black);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+h1, h2, h3, .premium-title {
+  font-family: var(--font-display);
+}
+
+/* Glass Card Utility */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Premium Button */
+.btn-primary {
+  background: linear-gradient(135deg, #7ff984 0%, #3bb74c 100%);
+  color: #002a07;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 15px var(--primary-glow);
+}
+
+.btn-primary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px var(--primary-glow);
+}
+
+/* Navigation Menu */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: rgba(18, 18, 18, 0.85);
+  backdrop-filter: blur(30px);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 1000;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.nav-item.active {
+  color: var(--primary-green);
+}
