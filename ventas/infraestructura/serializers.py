@@ -1,11 +1,13 @@
 from rest_framework import serializers
-from .models import Pedido, ItemPedido
-from inventario.infraestructura.models import ProductoModelo
+
+from .models import ItemPedido, Pedido
+
 
 class ItemPedidoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemPedido
-        fields = ['producto', 'cantidad', 'precio']
+        fields = ["producto", "cantidad", "precio"]
+
 
 class PedidoSerializer(serializers.ModelSerializer):
     items = ItemPedidoSerializer(many=True)
@@ -16,9 +18,18 @@ class PedidoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pedido
         fields = [
-            'id', 'cliente', 'estado', 'metodo_pago', 'costo_envio', 
-            'direccion', 'notas', 'creado_en', 'items', 
-            'total_productos', 'final_total', 'soporte_pago_url'
+            "id",
+            "cliente",
+            "estado",
+            "metodo_pago",
+            "costo_envio",
+            "direccion",
+            "notas",
+            "creado_en",
+            "items",
+            "total_productos",
+            "final_total",
+            "soporte_pago_url",
         ]
 
     def get_total_productos(self, obj):
@@ -37,7 +48,7 @@ class PedidoSerializer(serializers.ModelSerializer):
         return None
 
     def create(self, validated_data):
-        items_data = validated_data.pop('items')
+        items_data = validated_data.pop("items")
         pedido = Pedido.objects.create(**validated_data)
         for item_data in items_data:
             ItemPedido.objects.create(pedido=pedido, **item_data)

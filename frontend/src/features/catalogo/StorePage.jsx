@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 
 import { useCart } from '../../shared/CartContext';
 
+const API_BASE_URL = 'http://127.0.0.1:8000';
+
 const StorePage = () => {
     const { itemCount, addToCart, total } = useCart();
     const [productos, setProductos] = useState([]);
@@ -345,7 +347,7 @@ const ProductCard = ({ producto, addToCart }) => {
             }}>
                 {!imgError ? (
                     <img 
-                        src={producto.imagen_url} 
+                        src={producto.imagen ? (producto.imagen.startsWith('http') ? producto.imagen : `${API_BASE_URL}${producto.imagen}`) : (producto.imagen_url || '/placeholder.png')} 
                         alt={producto.nombre} 
                         style={{ width: '80%', height: '80%', objectFit: 'contain', transition: 'transform 0.4s ease' }}
                         onError={() => setImgError(true)}
@@ -372,26 +374,32 @@ const ProductCard = ({ producto, addToCart }) => {
                     <span style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
                         ${new Intl.NumberFormat('es-CO').format(producto.precio)}
                     </span>
-                    <button 
-                        style={{ 
-                            background: 'var(--surface-highest)', 
-                            border: '1px solid var(--glass-border)', 
-                            borderRadius: '10px', 
-                            width: '38px', 
-                            height: '38px', 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            color: 'var(--primary-green)',
-                            transition: 'var(--transition)',
-                        }}
-                        onClick={() => addToCart(producto)}
-                        onMouseOver={(e) => { e.currentTarget.style.background = 'var(--primary-green)'; e.currentTarget.style.color = '#000'; }}
-                        onMouseOut={(e) => { e.currentTarget.style.background = 'var(--surface-highest)'; e.currentTarget.style.color = 'var(--primary-green)'; }}
-                    >
-                        <span className="material-icons-round" style={{ fontSize: '20px' }}>add</span>
-                    </button>
+                    {producto.existencias === 0 ? (
+                        <span style={{ color: 'var(--error)', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', border: '1px solid var(--error)', padding: '4px 8px', borderRadius: '4px' }}>
+                            Agotado
+                        </span>
+                    ) : (
+                        <button 
+                            style={{ 
+                                background: 'var(--surface-highest)', 
+                                border: '1px solid var(--glass-border)', 
+                                borderRadius: '10px', 
+                                width: '38px', 
+                                height: '38px', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                color: 'var(--primary-green)',
+                                transition: 'var(--transition)',
+                            }}
+                            onClick={() => addToCart(producto)}
+                            onMouseOver={(e) => { e.currentTarget.style.background = 'var(--primary-green)'; e.currentTarget.style.color = '#000'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.background = 'var(--surface-highest)'; e.currentTarget.style.color = 'var(--primary-green)'; }}
+                        >
+                            <span className="material-icons-round" style={{ fontSize: '20px' }}>add</span>
+                        </button>
+                    )}
                 </div>
             </div>
         </motion.div>

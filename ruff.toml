@@ -1,0 +1,39 @@
+# ruff.toml para Backend La Lico (Django)
+
+# Configuración global
+line-length = 100
+target-version = "py310"
+
+[lint]
+# Habilitar reglas estandar y recomendadas
+select = [
+    "E",   # Errores por defecto de pycodestyle
+    "F",   # Pylint
+    "N",   # pep8-naming (ENFORZO DE NOMBRAMIENTO)
+    "W",   # Advertencias de pycodestyle
+    "I",   # isort (Manejo de imports)
+    "DJ",  # Reglas de DJANGO (# puntos adicionales validaciones framework)
+]
+ignore = [
+    "E501", # Limite estricto de line length (relajado)
+    "F403", # Permitir from module import * en models.py legacy
+    "E402", # Permitir imports despues de django.setup()
+    "DJ001", # Permitir null=True en TextField segun la DB actual
+    "DJ008", # str() model missing on secondary models
+    "E722", # Bare except permitidos para fallbacks
+]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+
+[lint.per-file-ignores]
+# Excepciones válidas para la arquitectura de Django donde el framework dicta la inicialización
+"*/settings.py" = ["E501"]
+"__init__.py" = ["F401", "E402"]
+"*/migrations/*" = ["E501"]
+"manage.py" = ["E501"]
+
+[lint.isort]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+known-first-party = ["licotienda", "ventas", "inventario", "usuarios", "soporte"]

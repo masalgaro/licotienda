@@ -108,7 +108,20 @@ const Checkout = () => {
       }
     } catch (error) {
       console.error("Error al crear el pedido:", error);
-      const errorMsg = error.response?.data?.error || "Hubo un error al procesar tu pedido.";
+      let errorMsg = "Hubo un error al procesar tu pedido.";
+      if (error.response && error.response.data) {
+        if (error.response.data.error) {
+            errorMsg = error.response.data.error;
+        } else if (typeof error.response.data === 'object') {
+            const keys = Object.keys(error.response.data);
+            const vals = Object.values(error.response.data);
+            if (keys.length > 0 && Array.isArray(vals[0])) {
+                errorMsg = `Campo '${keys[0]}': ${vals[0][0]}`;
+            } else {
+                errorMsg = JSON.stringify(error.response.data);
+            }
+        }
+      }
       alert(errorMsg);
     } finally {
       setEnviando(false);
@@ -371,8 +384,8 @@ const Checkout = () => {
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <p className="label-caps" style={{ fontSize: '0.7rem', color: '#fdbd2d', marginBottom: '6px', letterSpacing: '2px' }}>Bancolombia</p>
-                                    <p style={{ fontWeight: 900, fontSize: '1.4rem', margin: '4px 0', fontFamily: 'var(--font-display)', color: 'white' }}>Ahorros: 300 554 571 11</p>
-                                    <p style={{ fontSize: '0.85rem', opacity: 0.6, fontWeight: 500 }}>Titular: La Lico Premium Store</p>
+                                    <p style={{ fontWeight: 900, fontSize: '1.4rem', margin: '4px 0', fontFamily: 'var(--font-display)', color: 'white' }}>Ahorros: 015-466608-73</p>
+                                    <p style={{ fontSize: '0.85rem', opacity: 0.6, fontWeight: 500 }}>Sebastian Ríos Quintero - LaLico</p>
                                 </div>
                                 <motion.div 
                                     whileHover={{ scale: 1.05 }}
@@ -381,7 +394,7 @@ const Checkout = () => {
                                     style={{ textAlign: 'center', background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer' }}
                                 >
                                     <div style={{ background: 'white', padding: '8px', borderRadius: '8px', marginBottom: '8px', width: '70px', height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                                        <img src="/qr_lalico.png" alt="QR" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <img src="/qr_bancolombia.jpeg" alt="QR Bancolombia" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </div>
                                     <p style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-secondary)' }}>Ampliar QR</p>
                                 </motion.div>
@@ -493,7 +506,7 @@ const Checkout = () => {
                     </header>
                     <div style={{ background: 'white', padding: '10px', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
                         <img 
-                            src="/qr_lalico.png" 
+                            src="/qr_bancolombia.jpeg" 
                             alt="Bancolombia QR" 
                             style={{ width: '100%', borderRadius: '8px' }} 
                         />

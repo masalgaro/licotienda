@@ -1,9 +1,12 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 from django.db.models import Q
-from .serializers import ProductoSerializer, CategoriaSerializer
-from inventario.infraestructura.models import ProductoModelo, CategoriaModelo
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from inventario.infraestructura.models import CategoriaModelo, ProductoModelo
+
+from .serializers import CategoriaSerializer, ProductoSerializer
+
 
 class ListarProductosView(APIView):
     """
@@ -12,27 +15,30 @@ class ListarProductosView(APIView):
     HU 1: Listar Productos.
     HU 2: Buscar Nombre Producto.
     """
+
     def get(self, request):
-        query = request.query_params.get('q', '')
-        categoria_id = request.query_params.get('categoria', None)
-        
+        query = request.query_params.get("q", "")
+        categoria_id = request.query_params.get("categoria", None)
+
         productos = ProductoModelo.objects.filter(esta_activo=True)
-        
+
         if query:
             productos = productos.filter(
                 Q(nombre__icontains=query) | Q(descripcion__icontains=query)
             )
-            
+
         if categoria_id:
             productos = productos.filter(categoria_id=categoria_id)
-            
+
         serializer = ProductoSerializer(productos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class ListarCategoriasView(APIView):
     """
     Listar todas las categorías disponibles.
     """
+
     def get(self, request):
         categorias = CategoriaModelo.objects.all()
         serializer = CategoriaSerializer(categorias, many=True)

@@ -29,3 +29,6 @@ threadpoolctl==3.6.0
 cycler==0.12.1
 fonttools==4.62.1
 kiwisolver==1.5.0
+
+# Calidad de Código y Estándares
+ruff==0.15.7

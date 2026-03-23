@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class CategoriaModelo(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
 
@@ -10,14 +11,22 @@ class CategoriaModelo(models.Model):
     def __str__(self):
         return self.nombre
 
+
 class ProductoModelo(models.Model):
     nombre = models.CharField(max_length=200)
     precio = models.DecimalField(max_digits=12, decimal_places=2)
     descripcion = models.TextField(blank=True, null=True)
-    imagen_url = models.URLField(max_length=500, blank=True, null=True)
-    categoria = models.ForeignKey(CategoriaModelo, on_delete=models.SET_NULL, null=True, related_name="productos")
-    esta_activo = models.BooleanField(default=True, help_text="Marque como False para indicar que el producto está agotado")
-    
+    imagen = models.ImageField(upload_to="productos/", blank=True, null=True)
+    categoria = models.ForeignKey(
+        CategoriaModelo, on_delete=models.SET_NULL, null=True, related_name="productos"
+    )
+    esta_activo = models.BooleanField(
+        default=True, help_text="Marque como False para indicar que el producto está agotado"
+    )
+    existencias = models.PositiveIntegerField(
+        default=0, help_text="Cantidad disponible en inventario"
+    )
+
     creado_en = models.DateTimeField(auto_now_add=True)
     actualizado_en = models.DateTimeField(auto_now=True)
 

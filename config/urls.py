@@ -1,16 +1,16 @@
-from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
     # API Versión 1 - Arquitectura Hexagonal
-    path('api/v1/usuarios/', include('usuarios.urls')),
-    path('api/v1/soporte/', include('soporte.urls')),
-    path('api/v1/catalogo/', include('catalogo.urls')),
-    path('api/v1/inventario/', include('inventario.urls')),
-    path('api/v1/ventas/', include('ventas.urls')),
+    path("api/v1/usuarios/", include("usuarios.urls")),
+    path("api/v1/soporte/", include("soporte.urls")),
+    path("api/v1/catalogo/", include("catalogo.urls")),
+    path("api/v1/inventario/", include("inventario.urls")),
+    path("api/v1/ventas/", include("ventas.urls")),
 ]
 
 if settings.DEBUG:

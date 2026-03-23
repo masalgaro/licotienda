@@ -6,14 +6,28 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 from inventario.infraestructura.models import CategoriaModelo, ProductoModelo
+from ventas.infraestructura.models import ItemPedido, Pedido
 
 
 def populate():
-    # Clear existing to be safe
-    CategoriaModelo.objects.all().delete()
+    # 1. Limpiar datos existentes
+    print("Limpiando datos antiguos...")
+    ItemPedido.objects.all().delete()
+    Pedido.objects.all().delete()
     ProductoModelo.objects.all().delete()
+    CategoriaModelo.objects.all().delete()
 
-    data = {
+    # 2. Definición de Categorías
+    categorias_data = {
+        "Licores": "Licores diferentes a Aguardiente y Ron",
+        "Aguardiente": "Toda clase de aguardientes.",
+        "Rones": "Toda clase de rones",
+        "Snacks": "Toda clase de snacks comestibles",
+        "Cervezas": "toda clase de cervezas.",
+    }
+
+    # 3. Datos de Productos por Categoría
+    productos_data = {
         "Licores": [
             {
                 "nombre": "Tequila Jose Cuervo Botella 750ml",
@@ -131,17 +145,24 @@ def populate():
         ],
     }
 
-    for cat_name, productos in data.items():
-        cat, created = CategoriaModelo.objects.get_or_create(nombre=cat_name)
-        for p in productos:
+    # 4. Insertar en la BD
+    for cat_nombre, descripcion in categorias_data.items():
+        print(f"Insertando categoría: {cat_nombre}")
+        cat_obj = CategoriaModelo.objects.create(nombre=cat_nombre)
+
+        productos_lista = productos_data.get(cat_nombre, [])
+        for p in productos_lista:
             ProductoModelo.objects.create(
                 nombre=p["nombre"],
                 precio=p["precio"],
-                imagen_url=p["imagen"],
-                categoria=cat,
+                imagen=p["imagen"],
+                categoria=cat_obj,
+                existencias=10,  # Stock inicial por defecto
                 esta_activo=True,
             )
-    print("Database populated successfully!")
+            print(f"  - Producto: {p['nombre']} (${p['precio']})")
+
+    print("\n¡Base de datos populada exitosamente!")
 
 
 if __name__ == "__main__":

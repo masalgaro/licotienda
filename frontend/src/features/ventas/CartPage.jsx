@@ -4,16 +4,18 @@ import { useCart } from '../../shared/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const API_BASE_URL = 'http://127.0.0.1:8000';
+
 const CartPage = () => {
     const { cart, updateQuantity, addToCart, total, itemCount } = useCart();
     const navigate = useNavigate();
     const [sugerencias, setSugerencias] = React.useState([]);
+    const [validando, setValidando] = React.useState(false);
 
     React.useEffect(() => {
         const fetchSugerencias = async () => {
             try {
                 const res = await axios.get('http://127.0.0.1:8000/api/v1/catalogo/productos/');
-                // Filtrar los que ya están en el carrito y tomar 4 aleatorios o los primeros
                 const disponibles = res.data.filter(p => !cart.find(c => c.id === p.id));
                 setSugerencias(disponibles.slice(0, 4));
             } catch (err) {
@@ -22,6 +24,27 @@ const CartPage = () => {
         };
         fetchSugerencias();
     }, [cart]);
+
+    const handleProceedToCheckout = async (e) => {
+        e.preventDefault();
+        setValidando(true);
+        try {
+            const formData = {
+                items: cart.map(item => ({
+                    producto: item.id,
+                    cantidad: item.quantity
+                }))
+            };
+            const res = await axios.post(`${API_BASE_URL}/api/v1/ventas/validar-carrito/`, formData);
+            if (res.data.exito) {
+                navigate('/checkout');
+            }
+        } catch(err) {
+            alert(err.response?.data?.error || "Error validando el carrito. Algunas unidades ya no están disponibles.");
+        } finally {
+            setValidando(false);
+        }
+    };
 
     return (
         <div className="app-container animate-fade">
@@ -64,7 +87,7 @@ const CartPage = () => {
                                     style={{ padding: '16px', margin: 0, display: 'flex', gap: '16px', alignItems: 'center' }}
                                 >
                                     <div style={{ width: '72px', height: '72px', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                        <img src={item.imagen_url} alt={item.nombre} style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
+                                        <img src={item.imagen ? (item.imagen.startsWith('http') ? item.imagen : `${API_BASE_URL}${item.imagen}`) : (item.imagen_url || '/placeholder.png')} alt={item.nombre} style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
                                     </div>
                                     
                                     <div style={{ flexGrow: 1, minWidth: 0 }}>
@@ -113,7 +136,7 @@ const CartPage = () => {
                                             }}
                                         >
                                             <div style={{ height: '80px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <img src={prod.imagen_url} alt={prod.nombre} style={{ width: '60%', height: '60%', objectFit: 'contain' }} />
+                                                <img src={prod.imagen ? (prod.imagen.startsWith('http') ? prod.imagen : `${API_BASE_URL}${prod.imagen}`) : (prod.imagen_url || '/placeholder.png')} alt={prod.nombre} style={{ width: '60%', height: '60%', objectFit: 'contain' }} />
                                             </div>
                                             <h4 style={{ fontSize: '0.75rem', fontWeight: 600, height: '2.4em', overflow: 'hidden', margin: 0 }}>{prod.nombre}</h4>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
@@ -152,9 +175,9 @@ const CartPage = () => {
                                 </span>
                             </div>
 
-                            <Link to="/checkout" className="btn-primary" style={{ textDecoration: 'none', textAlign: 'center', marginTop: '24px', fontSize: '1.05rem' }}>
-                                Proceder al Checkout
-                            </Link>
+                            <button onClick={handleProceedToCheckout} disabled={validando} className="btn-primary" style={{ width: '100%', textDecoration: 'none', textAlign: 'center', marginTop: '24px', fontSize: '1.05rem', border: 'none', cursor: validando ? 'not-allowed' : 'pointer', opacity: validando ? 0.7 : 1 }}>
+                                {validando ? 'Verificando stock...' : 'Proceder al Checkout'}
+                            </button>
                         </div>
                     </div>
                 </div>

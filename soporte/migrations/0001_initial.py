@@ -4,38 +4,57 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='InfoContacto',
+            name="InfoContacto",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('whatsapp_url', models.URLField(blank=True, max_length=300)),
-                ('instagram_url', models.URLField(blank=True, max_length=300)),
-                ('facebook_url', models.URLField(blank=True, max_length=300)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("whatsapp_url", models.URLField(blank=True, max_length=300)),
+                ("instagram_url", models.URLField(blank=True, max_length=300)),
+                ("facebook_url", models.URLField(blank=True, max_length=300)),
             ],
             options={
-                'verbose_name': 'Información de Contacto',
-                'verbose_name_plural': 'Información de Contactos',
+                "verbose_name": "Información de Contacto",
+                "verbose_name_plural": "Información de Contactos",
             },
         ),
         migrations.CreateModel(
-            name='SoportePago',
+            name="SoportePago",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('imagen_url', models.URLField(max_length=500)),
-                ('estado', models.CharField(choices=[('PENDIENTE', 'Pendiente'), ('VERIFICADO', 'Verificado'), ('RECHAZADO', 'Rechazado')], default='PENDIENTE', max_length=20)),
-                ('motivo_rechazo', models.TextField(blank=True)),
-                ('subido_en', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("imagen_url", models.URLField(max_length=500)),
+                (
+                    "estado",
+                    models.CharField(
+                        choices=[
+                            ("PENDIENTE", "Pendiente"),
+                            ("VERIFICADO", "Verificado"),
+                            ("RECHAZADO", "Rechazado"),
+                        ],
+                        default="PENDIENTE",
+                        max_length=20,
+                    ),
+                ),
+                ("motivo_rechazo", models.TextField(blank=True)),
+                ("subido_en", models.DateTimeField(auto_now_add=True)),
             ],
             options={
-                'verbose_name': 'Soporte de Pago',
-                'verbose_name_plural': 'Soportes de Pago',
+                "verbose_name": "Soporte de Pago",
+                "verbose_name_plural": "Soportes de Pago",
             },
         ),
     ]

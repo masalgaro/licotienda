@@ -1,13 +1,16 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from .serializers import PedidoSerializer
-from .models import Pedido
-from usuarios.infraestructura.models import Usuario, UsuarioDireccion
 import re
 
+from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from soporte.infraestructura.models import SoportePago
+from usuarios.infraestructura.models import Usuario, UsuarioDireccion
+
+from .models import Pedido
+from .serializers import PedidoSerializer
+
 
 class CrearPedidoView(APIView):
     """
@@ -16,90 +19,174 @@ class CrearPedidoView(APIView):
     Soporta 'Checkout Rápido' por teléfono.
     HU 6: Gestión de Soporte de Pago.
     """
+
     permission_classes = [AllowAny]
 
     def post(self, request):
         # Manejar multipart/form-data
         data = request.data.copy()
-        comprobante = request.FILES.get('comprobante')
-        
-        items_json = data.get('items')
+        comprobante = request.FILES.get("comprobante")
+
+        items_json = data.get("items")
         # Si items viene como string (por FormData), parseamos JSON
         import json
+
         if isinstance(items_json, str):
-            try: items_data = json.loads(items_json)
-            except: items_data = []
+            try:
+                items_data = json.loads(items_json)
+            except:
+                items_data = []
         else:
             items_data = items_json or []
-            
-        telefono_raw = data.get('telefono')
-        nombres = data.get('nombres', '')
-        apellidos = data.get('apellidos', '')
-        direccion = data.get('direccion', '')
-        recordar = data.get('recordar_direccion') == 'true' or data.get('recordar_direccion') is True
-        metodo_pago = data.get('metodo_pago', 'EFECTIVO').upper()
+
+        telefono_raw = data.get("telefono")
+        nombres = data.get("nombres", "")
+        apellidos = data.get("apellidos", "")
+        direccion = data.get("direccion", "")
+        recordar = (
+            data.get("recordar_direccion") == "true" or data.get("recordar_direccion") is True
+        )
+        metodo_pago = data.get("metodo_pago", "EFECTIVO").upper()
 
         if not items_data or not telefono_raw:
             return Response({"error": "Datos incompletos"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if metodo_pago == 'TRANSFERENCIA' and not comprobante:
-            return Response({"error": "Debe adjuntar el comprobante de pago para transferencias"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if metodo_pago == "TRANSFERENCIA" and not comprobante:
+            return Response(
+                {"error": "Debe adjuntar el comprobante de pago para transferencias"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # 1. Identificar o Crear Usuario
-        tel_limpio = re.sub(r'\D', '', telefono_raw)
+        tel_limpio = re.sub(r"\D", "", telefono_raw)
         usuario = Usuario.objects.filter(telefono__icontains=tel_limpio).first()
-        
+
         if not usuario:
             usuario = Usuario.objects.create_user(
                 username=f"user_{tel_limpio}_{Usuario.objects.count()}",
                 telefono=tel_limpio,
                 first_name=nombres,
-                last_name=apellidos
+                last_name=apellidos,
             )
         else:
-            if nombres: usuario.first_name = nombres
-            if apellidos: usuario.last_name = apellidos
+            if nombres:
+                usuario.first_name = nombres
+            if apellidos:
+                usuario.last_name = apellidos
             usuario.save()
 
         # 2. Dirección
         if recordar and direccion:
-            UsuarioDireccion.objects.get_or_create(usuario=usuario, direccion=direccion, defaults={'es_predeterminada': True})
+            UsuarioDireccion.objects.get_or_create(
+                usuario=usuario, direccion=direccion, defaults={"es_predeterminada": True}
+            )
             usuario.direccion_base = direccion
             usuario.save()
 
         # 3. Serializar y Guardar Pedido
-        # Adaptamos data para el serializer
-        data['cliente'] = usuario.id
-        data['items'] = items_data
-        data['estado'] = 'PAGO_SUBIDO' if metodo_pago == 'TRANSFERENCIA' else 'PENDIENTE_PAGO'
-        data['metodo_pago'] = metodo_pago
-        
-        serializer = PedidoSerializer(data=data)
+        pedido_data = {
+            "cliente": usuario.id,
+            "items": items_data,
+            "estado": "PAGO_SUBIDO" if metodo_pago == "TRANSFERENCIA" else "PENDIENTE_PAGO",
+            "metodo_pago": metodo_pago,
+            "direccion": direccion,
+            "notas": request.data.get("notas", ""),
+            "costo_envio": request.data.get("costo_envio", 6000),
+        }
+
+        serializer = PedidoSerializer(data=pedido_data)
         if serializer.is_valid():
-            pedido = serializer.save()
-            
-            # 4. Crear Soporte de Pago if Transferencia
-            if metodo_pago == 'TRANSFERENCIA' and comprobante:
-                SoportePago.objects.create(
-                    pedido=pedido,
-                    comprobante=comprobante,
-                    estado='PENDIENTE'
+            # --- NUEVO: Validar y Decrementar Stock (HU 9 & 10) ---
+            from django.db import transaction
+            from rest_framework.exceptions import ValidationError
+
+            from inventario.infraestructura.models import ProductoModelo
+
+            try:
+                with transaction.atomic():
+                    for item_data in items_data:
+                        producto_id = item_data.get("producto")
+                        cantidad_req = int(item_data.get("cantidad", 1))
+
+                        producto = ProductoModelo.objects.select_for_update().get(id=producto_id)
+
+                        if producto.existencias < cantidad_req:
+                            raise ValidationError(
+                                f"Lamentablemente, el producto '{producto.nombre}' ya no cuenta con el stock solicitado. Por favor, ajusta tu carrito."
+                            )
+
+                        # Decrementar
+                        producto.existencias -= cantidad_req
+
+                        producto.save()
+
+                    # Si todo bien, guardamos el pedido
+                    pedido = serializer.save()
+
+                    # 4. Crear Soporte de Pago if Transferencia
+                    if metodo_pago == "TRANSFERENCIA" and comprobante:
+                        SoportePago.objects.create(
+                            pedido=pedido, comprobante=comprobante, estado="PENDIENTE"
+                        )
+
+                    return Response(
+                        {"exito": True, "msg": "Pedido creado con éxito", "pedido_id": pedido.id},
+                        status=status.HTTP_201_CREATED,
+                    )
+            except ValidationError as ve:
+                return Response(
+                    {"error": ve.detail[0] if isinstance(ve.detail, list) else str(ve.detail)},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-            
-            return Response({
-                "exito": True,
-                "msg": "Pedido creado con éxito",
-                "pedido_id": pedido.id
-            }, status=status.HTTP_201_CREATED)
-            
+            except Exception:
+                return Response(
+                    {"error": "Error procesando inventario."}, status=status.HTTP_400_BAD_REQUEST
+                )
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+
+class ValidarCarritoView(APIView):
+    """
+    Endpoint para que el Frontend valide el carrito antes de obligar al usuario a llenar datos.
+    """
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        from inventario.infraestructura.models import ProductoModelo
+
+        items = request.data.get("items", [])
+
+        for item in items:
+            prod_id = item.get("producto")
+            cantidad = int(item.get("cantidad", 1))
+            try:
+                prod = ProductoModelo.objects.get(id=prod_id)
+                if prod.existencias < cantidad:
+                    return Response(
+                        {
+                            "error": f"El producto '{prod.nombre}' se ha agotado o no tiene suficiente stock."
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+            except ProductoModelo.DoesNotExist:
+                return Response(
+                    {"error": "Un producto de tu carrito ya no existe."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        return Response({"exito": True}, status=status.HTTP_200_OK)
+
+
+from rest_framework.permissions import AllowAny
+
 
 class ListarMisPedidosView(APIView):
     """
     Listar los pedidos del cliente actual.
     """
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -107,44 +194,48 @@ class ListarMisPedidosView(APIView):
         serializer = PedidoSerializer(pedidos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class ListarTodosPedidosView(APIView):
     """
     Módulo Administrativo: Listar todos los pedidos.
     """
-    permission_classes = [AllowAny] # Temporal, idealmente IsAdminUser
+
+    permission_classes = [AllowAny]  # Temporal, idealmente IsAdminUser
 
     def get(self, request):
         pedidos = Pedido.objects.all().order_by("-creado_en")
         serializer = PedidoSerializer(pedidos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class GestionarPagoPedidoView(APIView):
     """
     Módulo Administrativo: Aprobar o Rechazar un pago.
     """
-    permission_classes = [AllowAny] # Temporal
+
+    permission_classes = [AllowAny]  # Temporal
 
     def post(self, request):
-        pedido_id = request.data.get('pedido_id')
-        accion = request.data.get('accion') # 'aprobar' o 'rechazar'
-        motivo = request.data.get('motivo', '')
+        pedido_id = request.data.get("pedido_id")
+        accion = request.data.get("accion")  # 'aprobar' o 'rechazar'
+        motivo = request.data.get("motivo", "")
 
         try:
             pedido = Pedido.objects.get(id=pedido_id)
-            soporte = getattr(pedido, 'soporte_pago', None)
+            soporte = getattr(pedido, "soporte_pago", None)
 
-            if accion == 'aprobar':
-                pedido.estado = 'PAGO_VERIFICADO'
+            if accion == "aprobar":
+                pedido.estado = "PAGO_VERIFICADO"
                 if soporte:
-                    soporte.estado = 'VERIFICADO'
+                    soporte.estado = "VERIFICADO"
                     soporte.save()
-            elif accion == 'rechazar':
-                pedido.estado = 'PAGO_RECHAZADO'
+            elif accion == "rechazar":
+                pedido.estado = "PAGO_RECHAZADO"
                 if soporte:
-                    soporte.estado = 'RECHAZADO'
+                    soporte.estado = "RECHAZADO"
                     soporte.motivo_rechazo = motivo
                     soporte.save()
-            
+
             pedido.save()
             return Response({"exito": True, "estado_nuevo": pedido.estado})
         except Pedido.DoesNotExist:

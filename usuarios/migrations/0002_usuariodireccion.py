@@ -6,24 +6,35 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('usuarios', '0001_initial'),
+        ("usuarios", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='UsuarioDireccion',
+            name="UsuarioDireccion",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('direccion', models.CharField(max_length=255)),
-                ('es_predeterminada', models.BooleanField(default=False)),
-                ('fecha_creacion', models.DateTimeField(auto_now_add=True)),
-                ('usuario', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='direcciones', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("direccion", models.CharField(max_length=255)),
+                ("es_predeterminada", models.BooleanField(default=False)),
+                ("fecha_creacion", models.DateTimeField(auto_now_add=True)),
+                (
+                    "usuario",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="direcciones",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Dirección de Usuario',
-                'verbose_name_plural': 'Direcciones de Usuario',
+                "verbose_name": "Dirección de Usuario",
+                "verbose_name_plural": "Direcciones de Usuario",
             },
         ),
     ]
