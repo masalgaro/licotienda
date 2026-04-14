@@ -4,27 +4,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const OrdersAdminPage = () => {
+    // motion is used in JSX below
+    const _ = motion;
     const [pedidos, setPedidos] = useState([]);
-    const [cargando, setCargando] = useState(true);
     const [filtro, setFiltro] = useState('TODOS');
     const [selectedOrder, setSelectedOrder] = useState(null); // For modal/preview proof
     const [motivoRechazo, setMotivoRechazo] = useState('');
 
-    useEffect(() => {
-        fetchOrders();
-    }, []);
-
     const fetchOrders = async () => {
-        setCargando(true);
         try {
             const res = await axios.get('http://127.0.0.1:8000/api/v1/ventas/todos/');
             setPedidos(res.data);
-        } catch (err) {
-            console.error("Error fetching orders:", err);
-        } finally {
-            setCargando(false);
+        } catch (_err) {
+            console.error("Error fetching orders:", _err);
         }
     };
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchOrders();
+    }, []);
 
     const handleAction = async (pedidoId, accion) => {
         if (accion === 'rechazar' && !motivoRechazo) {
@@ -43,7 +42,7 @@ const OrdersAdminPage = () => {
                 setSelectedOrder(null);
                 setMotivoRechazo('');
             }
-        } catch (err) {
+        } catch {
             alert("Error al procesar la acción");
         }
     };

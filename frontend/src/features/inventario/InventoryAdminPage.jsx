@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -13,9 +13,10 @@ import {
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
 const InventoryAdminPage = () => {
+    // motion is used in JSX below
+    const _ = motion;
     const [productos, setProductos] = useState([]);
     const [categorias, setCategorias] = useState([]);
-    const [cargando, setCargando] = useState(true);
     
     // UI State
     const [showModal, setShowModal] = useState(false);
@@ -29,18 +30,7 @@ const InventoryAdminPage = () => {
         nombre: '', precio: '', existencias: 1, imagen: null, categoria: '', esta_activo: true
     });
 
-    const stats = {
-        total: productos.length,
-        categorias: categorias.length,
-        activos: productos.filter(p => p.esta_activo).length
-    };
-
-    useEffect(() => {
-        fetchData();
-    }, []);
-
     const fetchData = async () => {
-        setCargando(true);
         try {
             const [prodRes, catRes] = await Promise.all([
                 axios.get('http://127.0.0.1:8000/api/v1/inventario/productos/'),
@@ -48,11 +38,20 @@ const InventoryAdminPage = () => {
             ]);
             setProductos(prodRes.data);
             setCategorias(catRes.data);
-        } catch (err) {
-            console.error("Error admin fetching:", err);
-        } finally {
-            setCargando(false);
+        } catch (_err) {
+            console.error("Error admin fetching:", _err);
         }
+    };
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchData();
+    }, []);
+
+    const stats = {
+        total: productos.length,
+        categorias: categorias.length,
+        activos: productos.filter(p => p.esta_activo).length
     };
 
     const handleToggleActive = async (id, status) => {
@@ -63,7 +62,7 @@ const InventoryAdminPage = () => {
             if (res.status === 200) {
                 setProductos(productos.map(p => p.id === id ? { ...p, esta_activo: !status } : p));
             }
-        } catch (err) {
+        } catch {
             alert("Error al cambiar estado");
         }
     };
@@ -73,8 +72,8 @@ const InventoryAdminPage = () => {
         try {
             await axios.delete(`http://127.0.0.1:8000/api/v1/inventario/productos/${id}/`);
             setProductos(productos.filter(p => p.id !== id));
-        } catch (err) {
-            alert(err.response?.data?.detail || "Error al eliminar");
+        } catch (_err) {
+            alert(_err.response?.data?.detail || "Error al eliminar");
         }
     };
 
@@ -105,9 +104,9 @@ const InventoryAdminPage = () => {
             setShowModal(false);
             setSelectedFile(null);
             fetchData();
-        } catch (err) {
-            console.error("Save error:", err.response?.data);
-            alert("Error al guardar producto: " + JSON.stringify(err.response?.data || "Error desconocido"));
+        } catch (_err) {
+            console.error("Save error:", _err.response?.data);
+            alert("Error al guardar producto: " + JSON.stringify(_err.response?.data || "Error desconocido"));
         }
     };
 
@@ -124,8 +123,8 @@ const InventoryAdminPage = () => {
             await axios.post('http://127.0.0.1:8000/api/v1/inventario/categorias/', { nombre: newCatName });
             setNewCatName('');
             fetchData();
-        } catch (err) {
-            alert("Error al crear categoría: " + JSON.stringify(err.response?.data || "Error"));
+        } catch (_err) {
+            alert("Error al crear categoría: " + JSON.stringify(_err.response?.data || "Error"));
         }
     };
 
@@ -135,8 +134,8 @@ const InventoryAdminPage = () => {
                 await axios.put(`http://127.0.0.1:8000/api/v1/inventario/categorias/${cat.id}/`, { nombre: editCatName });
                 setEditingCatId(null);
                 fetchData();
-            } catch(err) {
-                alert("Error al editar: " + JSON.stringify(err.response?.data || "Error."));
+            } catch(_err) {
+                alert("Error al editar: " + JSON.stringify(_err.response?.data || "Error."));
             }
         } else {
             setEditingCatId(cat.id);
@@ -153,8 +152,8 @@ const InventoryAdminPage = () => {
         try {
             await axios.delete(`http://127.0.0.1:8000/api/v1/inventario/categorias/${id}/`);
             fetchData();
-        } catch(e) {
-            alert(e.response?.data?.error || JSON.stringify(e.response?.data || "Error al eliminar."));
+        } catch(_e) {
+            alert(_e.response?.data?.error || JSON.stringify(_e.response?.data || "Error al eliminar."));
         }
     };
 

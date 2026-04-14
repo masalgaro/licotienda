@@ -3,11 +3,13 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-import { useCart } from '../../shared/CartContext';
+import { useCart } from '../../shared/cartHooks';
 
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
 const StorePage = () => {
+    // motion is used in JSX below
+    const _ = motion;
     const { itemCount, addToCart, total } = useCart();
     const [productos, setProductos] = useState([]);
     const [categorias, setCategorias] = useState([]);

@@ -1,9 +1,10 @@
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const Contact = () => {
-  const navigate = useNavigate();
+  // motion is used in JSX below
+  const _ = motion;
 
   return (
     <div className="app-container animate-fade">
