@@ -97,9 +97,9 @@ const StorePage = () => {
                 }}>
                     <span className="material-icons-round" style={{ fontSize: '20px' }}>info</span> INFO
                 </a>
-                <Link to="/admin/inventario" style={{ 
-                    display: 'flex', alignItems: 'center', gap: '8px', 
-                    textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: 600, fontSize: '0.85rem' 
+                <Link to="/admin/pedidos" style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: 600, fontSize: '0.85rem'
                 }}>
                     <span className="material-icons-round" style={{ fontSize: '20px' }}>inventory_2</span> ADMIN
                 </Link>
@@ -290,7 +290,7 @@ const StorePage = () => {
                     <span className="material-icons-round">info</span>
                     <span>Info</span>
                 </a>
-                <Link to="/admin/inventario" className="nav-item">
+                <Link to="/admin/pedidos" className="nav-item">
                     <span className="material-icons-round">inventory_2</span>
                     <span>Admin</span>
                 </Link>

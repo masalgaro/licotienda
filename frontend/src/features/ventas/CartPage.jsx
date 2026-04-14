@@ -197,7 +197,7 @@ const CartPage = () => {
                     <span className="material-icons-round">info</span>
                     <span>Info</span>
                 </Link>
-                <Link to="/admin/inventario" className="nav-item">
+                <Link to="/admin/pedidos" className="nav-item">
                     <span className="material-icons-round">inventory_2</span>
                     <span>Admin</span>
                 </Link>
