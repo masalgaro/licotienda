@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -109,7 +109,7 @@ const OrdersAdminPage = () => {
                                     {pedido.items?.length || 0} items
                                 </td>
                                 <td style={{ padding: '0 24px', fontWeight: 700, color: 'var(--primary-green)' }}>
-                                    ${new Intl.NumberFormat('es-CO').format(pedido.costo_envio)} {/* Note: Price logic should be reviewed in serializer */}
+                                    ${new Intl.NumberFormat('es-CO').format(pedido.final_total)}
                                 </td>
                                 <td style={{ padding: '0 24px' }}>
                                     <span style={{ fontSize: '0.7rem', fontWeight: 800, color: getStatusColor(pedido.estado), background: `${getStatusColor(pedido.estado)}20`, padding: '4px 10px', borderRadius: '6px' }}>
@@ -138,8 +138,8 @@ const OrdersAdminPage = () => {
                                                 >
                                                     <span className="material-icons-round">check</span>
                                                 </button>
-                                                <button 
-                                                    onClick={() => { setSelectedOrder(pedido); /* Open rejection note UI */ }}
+                                                <button
+                                                    onClick={() => setSelectedOrder(pedido)}
                                                     style={{ background: 'rgba(213, 61, 24, 0.15)', color: 'var(--error)', border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer' }}
                                                 >
                                                     <span className="material-icons-round">close</span>
