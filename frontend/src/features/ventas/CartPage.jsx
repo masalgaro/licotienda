@@ -7,8 +7,6 @@ import axios from 'axios';
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
 const CartPage = () => {
-    // motion is used in JSX below
-    const _ = motion;
     const { cart, updateQuantity, addToCart, total, itemCount } = useCart();
     const navigate = useNavigate();
     const [sugerencias, setSugerencias] = React.useState([]);

@@ -4,8 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const OrdersAdminPage = () => {
-    // motion is used in JSX below
-    const _ = motion;
     const [pedidos, setPedidos] = useState([]);
     const [filtro, setFiltro] = useState('TODOS');
     const [selectedOrder, setSelectedOrder] = useState(null); // For modal/preview proof

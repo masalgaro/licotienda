@@ -5,8 +5,6 @@ import axios from 'axios';
 import { useCart } from '../../shared/cartHooks';
 
 const Checkout = () => {
-  // motion is used in JSX below
-  const _ = motion;
   const { cart, total, clearCart } = useCart();
   const navigate = useNavigate();
   

@@ -13,8 +13,6 @@ import {
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
 const InventoryAdminPage = () => {
-    // motion is used in JSX below
-    const _ = motion;
     const [productos, setProductos] = useState([]);
     const [categorias, setCategorias] = useState([]);
     

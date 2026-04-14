@@ -3,9 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const Contact = () => {
-  // motion is used in JSX below
-  const _ = motion;
-
   return (
     <div className="app-container animate-fade">
       <header style={{ marginBottom: '40px' }}>
