@@ -332,8 +332,13 @@ const ProductCard = ({ producto, addToCart }) => {
             exit={{ opacity: 0, scale: 0.95 }}
             layout
             className="glass-card" 
-            style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px', cursor: 'default' }}
+            style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px', cursor: 'default', position: 'relative' }}
         >
+            {producto.en_oferta && (
+                <div style={{ position: 'absolute', top: '-10px', right: '-10px', background: 'var(--primary-green)', color: '#000', padding: '6px 14px', borderRadius: '40px', fontWeight: 900, fontSize: '0.75rem', boxShadow: '0 4px 15px rgba(0, 255, 140, 0.4)', zIndex: 10, border: '2px solid #000' }}>
+                    -{producto.descuento_porcentaje}%
+                </div>
+            )}
             {/* Product Image */}
             <div style={{ 
                 height: '160px', 
@@ -371,9 +376,16 @@ const ProductCard = ({ producto, addToCart }) => {
                 </div>
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-                    <span style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
-                        ${new Intl.NumberFormat('es-CO').format(producto.precio)}
-                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {producto.en_oferta && (
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textDecoration: 'line-through', marginBottom: '-2px' }}>
+                                ${new Intl.NumberFormat('es-CO').format(producto.precio)}
+                            </span>
+                        )}
+                        <span style={{ fontWeight: 800, fontSize: '1.05rem', color: producto.en_oferta ? 'var(--primary-green)' : 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
+                            ${new Intl.NumberFormat('es-CO').format(producto.en_oferta ? (producto.precio - (producto.precio * producto.descuento_porcentaje / 100)) : producto.precio)}
+                        </span>
+                    </div>
                     {producto.existencias === 0 ? (
                         <span style={{ color: 'var(--error)', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', border: '1px solid var(--error)', padding: '4px 8px', borderRadius: '4px' }}>
                             Agotado

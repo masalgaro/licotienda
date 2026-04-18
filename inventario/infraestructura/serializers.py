@@ -18,6 +18,12 @@ class ProductoInventarioSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("El stock no puede ser negativo")
         return value
 
+    def validate_descuento_porcentaje(self, value):
+        if value < 0 or value > 100:
+            raise serializers.ValidationError("El porcentaje de descuento debe estar entre 0 y 100")
+        return value
+
+
     def validate(self, attrs):
         if not self.instance and not attrs.get("imagen"):
             raise serializers.ValidationError(

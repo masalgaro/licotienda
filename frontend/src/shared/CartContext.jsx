@@ -39,7 +39,8 @@ export const CartProvider = ({ children }) => {
 
     const clearCart = () => setCart([]);
 
-    const total = cart.reduce((acc, item) => acc + (item.precio * item.quantity), 0);
+    const getFinalPrice = (item) => item.en_oferta ? (item.precio - (item.precio * item.descuento_porcentaje / 100)) : item.precio;
+    const total = cart.reduce((acc, item) => acc + (getFinalPrice(item) * item.quantity), 0);
     const itemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
     return (

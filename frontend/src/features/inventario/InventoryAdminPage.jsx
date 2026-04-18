@@ -25,7 +25,7 @@ const InventoryAdminPage = () => {
     const [editMode, setEditMode] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [currentProduct, setCurrentProduct] = useState({
-        nombre: '', precio: '', existencias: 1, imagen: null, categoria: '', esta_activo: true
+        nombre: '', precio: '', existencias: 1, imagen: null, categoria: '', esta_activo: true, en_oferta: false, descuento_porcentaje: 0
     });
 
     const fetchData = async () => {
@@ -83,6 +83,8 @@ const InventoryAdminPage = () => {
         formData.append('precio', parseFloat(currentProduct.precio));
         formData.append('existencias', parseInt(currentProduct.existencias));
         formData.append('esta_activo', currentProduct.esta_activo);
+        formData.append('en_oferta', currentProduct.en_oferta);
+        formData.append('descuento_porcentaje', parseInt(currentProduct.descuento_porcentaje) || 0);
         
         if (currentProduct.categoria) {
             formData.append('categoria', currentProduct.categoria);
@@ -109,7 +111,7 @@ const InventoryAdminPage = () => {
     };
 
     const handleNewProduct = () => {
-        setCurrentProduct({ nombre: '', precio: '', existencias: 1, imagen: null, categoria: '', esta_activo: true });
+        setCurrentProduct({ nombre: '', precio: '', existencias: 1, imagen: null, categoria: '', esta_activo: true, en_oferta: false, descuento_porcentaje: 0 });
         setSelectedFile(null);
         setEditMode(false);
         setShowModal(true);
@@ -244,6 +246,9 @@ const InventoryAdminPage = () => {
                                         </td>
                                         <td style={{ padding: '16px 20px', fontWeight: '600' }}>
                                             ${new Intl.NumberFormat('es-CO').format(p.precio)}
+                                            {p.en_oferta && (
+                                                <div style={{color: 'var(--primary-green)', fontSize: '0.8rem'}}>↓ {p.descuento_porcentaje}% OFF</div>
+                                            )}
                                         </td>
                                         <td style={{ padding: '16px 20px' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -335,6 +340,30 @@ const InventoryAdminPage = () => {
                                             type="number" className="premium-input" required 
                                             value={currentProduct.existencias}
                                             onChange={e => setCurrentProduct({...currentProduct, existencias: e.target.value})}
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-md)', background: 'rgba(0, 255, 140, 0.05)', padding: '12px', borderRadius: '12px' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                        <label className="label-caps" style={{ color: 'var(--primary-green)' }}>Habilitar Oferta</label>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginTop: '8px' }}>
+                                            <input 
+                                                type="checkbox" 
+                                                checked={currentProduct.en_oferta}
+                                                onChange={e => setCurrentProduct({...currentProduct, en_oferta: e.target.checked})}
+                                                style={{ width: '20px', height: '20px', accentColor: 'var(--primary-green)' }}
+                                            /> 
+                                            <span>Activar Descuento</span>
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label className="label-caps" style={{ opacity: currentProduct.en_oferta ? 1 : 0.4 }}>% Descuento</label>
+                                        <input 
+                                            type="number" className="premium-input"
+                                            disabled={!currentProduct.en_oferta}
+                                            value={currentProduct.descuento_porcentaje}
+                                            onChange={e => setCurrentProduct({...currentProduct, descuento_porcentaje: e.target.value})}
+                                            min="0" max="100"
                                         />
                                     </div>
                                 </div>
