@@ -70,7 +70,7 @@ describe('OrdersAdminPage', () => {
       renderOrdersPage();
 
       // Esperar a que los datos se carguen
-      const totalCells = await screen.findAllByText(/\$/);
+      await screen.findAllByText(/\$/);
 
       // Verificar que el primer total mostrado es 56.000 (final_total)
       expect(screen.getByText('$56.000')).toBeInTheDocument();
@@ -230,14 +230,7 @@ describe('OrdersAdminPage', () => {
 
       await screen.findByText('Cliente Prueba 1');
 
-      // 1. Click en botón rechazar
-      const closeButtons = screen.getAllByRole('button');
-      const rejectButton = closeButtons.find((btn) => {
-        const style = btn.getAttribute('style');
-        return style && style.includes('0.15) error');
-      });
-
-      // 2. Ver comprobante primero (alternativa)
+      // 1. Ver comprobante primero
       const viewButtons = screen.getAllByRole('button');
       const viewSupportButton = viewButtons.find((btn) =>
         within(btn).queryByText('image')
