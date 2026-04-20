@@ -70,7 +70,7 @@ describe('OrdersAdminPage', () => {
       renderOrdersPage();
 
       // Esperar a que los datos se carguen
-      const totalCells = await screen.findAllByText(/\$/);
+      await screen.findAllByText(/\$/);
 
       // Verificar que el primer total mostrado es 56.000 (final_total)
       expect(screen.getByText('$56.000')).toBeInTheDocument();
@@ -232,7 +232,7 @@ describe('OrdersAdminPage', () => {
 
       // 1. Click en botón rechazar
       const closeButtons = screen.getAllByRole('button');
-      const rejectButton = closeButtons.find((btn) => {
+      closeButtons.find((btn) => {
         const style = btn.getAttribute('style');
         return style && style.includes('0.15) error');
       });
