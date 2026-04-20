@@ -230,14 +230,7 @@ describe('OrdersAdminPage', () => {
 
       await screen.findByText('Cliente Prueba 1');
 
-      // 1. Click en botón rechazar
-      const closeButtons = screen.getAllByRole('button');
-      closeButtons.find((btn) => {
-        const style = btn.getAttribute('style');
-        return style && style.includes('0.15) error');
-      });
-
-      // 2. Ver comprobante primero (alternativa)
+      // 1. Ver comprobante primero
       const viewButtons = screen.getAllByRole('button');
       const viewSupportButton = viewButtons.find((btn) =>
         within(btn).queryByText('image')

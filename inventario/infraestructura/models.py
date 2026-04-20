@@ -26,6 +26,12 @@ class ProductoModelo(models.Model):
     existencias = models.PositiveIntegerField(
         default=0, help_text="Cantidad disponible en inventario"
     )
+    en_oferta = models.BooleanField(
+        default=False, help_text="Indica si el producto tiene una oferta aplicada"
+    )
+    descuento_porcentaje = models.PositiveIntegerField(
+        default=0, help_text="Porcentaje de descuento (0 a 100)"
+    )
 
     creado_en = models.DateTimeField(auto_now_add=True)
     actualizado_en = models.DateTimeField(auto_now=True)

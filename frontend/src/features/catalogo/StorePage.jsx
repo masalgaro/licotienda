@@ -6,6 +6,24 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../../shared/cartHooks';
 
 const API_BASE_URL = 'http://127.0.0.1:8000';
+const buildCatalogUrl = (query, categoriaId, soloOfertas) => {
+    const params = new URLSearchParams();
+
+    if (query) {
+        params.set('q', query);
+    }
+
+    if (categoriaId) {
+        params.set('categoria', categoriaId);
+    }
+
+    if (soloOfertas) {
+        params.set('en_oferta', 'true');
+    }
+
+    const queryString = params.toString();
+    return `${API_BASE_URL}/api/v1/catalogo/productos/${queryString ? `?${queryString}` : ''}`;
+};
 
 const StorePage = () => {
     const { itemCount, addToCart, total } = useCart();
@@ -13,13 +31,36 @@ const StorePage = () => {
     const [categorias, setCategorias] = useState([]);
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
     const [busqueda, setBusqueda] = useState('');
+    const [soloOfertas, setSoloOfertas] = useState(false);
     const [cargando, setCargando] = useState(true);
+
+    const fetchProductos = async ({
+        query = busqueda,
+        categoriaId = categoriaSeleccionada,
+        ofertas = soloOfertas,
+        showLoading = true
+    } = {}) => {
+        if (showLoading) {
+            setCargando(true);
+        }
+
+        try {
+            const res = await axios.get(buildCatalogUrl(query, categoriaId, ofertas));
+            setProductos(res.data);
+        } catch (error) {
+            console.error("Error cargando productos:", error);
+        } finally {
+            if (showLoading) {
+                setCargando(false);
+            }
+        }
+    };
 
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
                 const [prodRes, catRes] = await Promise.all([
-                    axios.get('http://127.0.0.1:8000/api/v1/catalogo/productos/'),
+                    axios.get(buildCatalogUrl('', null, false)),
                     axios.get('http://127.0.0.1:8000/api/v1/catalogo/categorias/')
                 ]);
                 setProductos(prodRes.data);
@@ -36,25 +77,30 @@ const StorePage = () => {
     const handleSearch = async (e) => {
         const val = e.target.value;
         setBusqueda(val);
-        try {
-            const res = await axios.get(`http://127.0.0.1:8000/api/v1/catalogo/productos/?q=${val}${categoriaSeleccionada ? `&categoria=${categoriaSeleccionada}` : ''}`);
-            setProductos(res.data);
-        } catch (error) {
-            console.error("Error en búsqueda:", error);
-        }
+        await fetchProductos({
+            query: val,
+            categoriaId: categoriaSeleccionada,
+            ofertas: soloOfertas
+        });
     };
 
     const filtrarPorCategoria = async (id) => {
         setCategoriaSeleccionada(id);
-        setCargando(true);
-        try {
-            const res = await axios.get(`http://127.0.0.1:8000/api/v1/catalogo/productos/?categoria=${id || ''}${busqueda ? `&q=${busqueda}` : ''}`);
-            setProductos(res.data);
-        } catch (error) {
-            console.error("Error filtrando por categoría:", error);
-        } finally {
-            setCargando(false);
-        }
+        await fetchProductos({
+            query: busqueda,
+            categoriaId: id,
+            ofertas: soloOfertas
+        });
+    };
+
+    const toggleSoloOfertas = async () => {
+        const nextSoloOfertas = !soloOfertas;
+        setSoloOfertas(nextSoloOfertas);
+        await fetchProductos({
+            query: busqueda,
+            categoriaId: categoriaSeleccionada,
+            ofertas: nextSoloOfertas
+        });
     };
 
     const infoRef = React.useRef(null);
@@ -185,6 +231,14 @@ const StorePage = () => {
                     />
                 </div>
 
+                <div className="hide-scrollbar" style={{ display: 'flex', gap: '10px', overflowX: 'auto', marginBottom: '16px', paddingBottom: '4px' }}>
+                    <CategoryPill
+                        label="Ofertas"
+                        active={soloOfertas}
+                        onClick={toggleSoloOfertas}
+                    />
+                </div>
+
                 {/* Categorías Slider */}
                 <div className="hide-scrollbar" style={{ display: 'flex', gap: '10px', overflowX: 'auto', marginBottom: '36px', paddingBottom: '4px', flexWrap: 'wrap' }}>
                     <CategoryPill 
@@ -222,8 +276,14 @@ const StorePage = () => {
                 {!cargando && productos.length === 0 && (
                     <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--text-secondary)' }}>
                         <span className="material-icons-round" style={{ fontSize: '56px', color: 'var(--surface-highest)', marginBottom: '16px', display: 'block' }}>liquor</span>
-                        <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', opacity: 0.7 }}>No encontramos nada similar.</p>
-                        <p style={{ fontSize: '0.85rem', marginTop: '8px', opacity: 0.4 }}>Intenta con otro término de búsqueda</p>
+                        <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', opacity: 0.7 }}>
+                            {soloOfertas ? 'No encontramos ofertas con esos filtros.' : 'No encontramos nada similar.'}
+                        </p>
+                        <p style={{ fontSize: '0.85rem', marginTop: '8px', opacity: 0.4 }}>
+                            {soloOfertas
+                                ? 'Prueba otra categoría o desactiva el filtro de ofertas'
+                                : 'Intenta con otro término de búsqueda'}
+                        </p>
                     </div>
                 )}
             </div>
@@ -332,8 +392,13 @@ const ProductCard = ({ producto, addToCart }) => {
             exit={{ opacity: 0, scale: 0.95 }}
             layout
             className="glass-card" 
-            style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px', cursor: 'default' }}
+            style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px', cursor: 'default', position: 'relative' }}
         >
+            {producto.en_oferta && (
+                <div style={{ position: 'absolute', top: '-10px', right: '-10px', background: 'var(--primary-green)', color: '#000', padding: '6px 14px', borderRadius: '40px', fontWeight: 900, fontSize: '0.75rem', boxShadow: '0 4px 15px rgba(0, 255, 140, 0.4)', zIndex: 10, border: '2px solid #000' }}>
+                    -{producto.descuento_porcentaje}%
+                </div>
+            )}
             {/* Product Image */}
             <div style={{ 
                 height: '160px', 
@@ -371,9 +436,16 @@ const ProductCard = ({ producto, addToCart }) => {
                 </div>
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-                    <span style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
-                        ${new Intl.NumberFormat('es-CO').format(producto.precio)}
-                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {producto.en_oferta && (
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textDecoration: 'line-through', marginBottom: '-2px' }}>
+                                ${new Intl.NumberFormat('es-CO').format(producto.precio)}
+                            </span>
+                        )}
+                        <span style={{ fontWeight: 800, fontSize: '1.05rem', color: producto.en_oferta ? 'var(--primary-green)' : 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
+                            ${new Intl.NumberFormat('es-CO').format(producto.en_oferta ? (producto.precio - (producto.precio * producto.descuento_porcentaje / 100)) : producto.precio)}
+                        </span>
+                    </div>
                     {producto.existencias === 0 ? (
                         <span style={{ color: 'var(--error)', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', border: '1px solid var(--error)', padding: '4px 8px', borderRadius: '4px' }}>
                             Agotado

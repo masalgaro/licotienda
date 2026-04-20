@@ -16,7 +16,14 @@ class InventarioProductoListCreateView(APIView):
     permission_classes = [AllowAny]  # Simplificado para pruebas
 
     def get(self, request):
+        en_oferta = request.query_params.get("en_oferta")
         productos = ProductoModelo.objects.all().order_by("-id")
+
+        if en_oferta is not None:
+            en_oferta_normalizado = en_oferta.strip().lower()
+            if en_oferta_normalizado in {"true", "false"}:
+                productos = productos.filter(en_oferta=en_oferta_normalizado == "true")
+
         serializer = ProductoInventarioSerializer(productos, many=True)
         return Response(serializer.data)
 
