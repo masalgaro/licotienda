@@ -137,7 +137,7 @@ def populate():
             ProductoModelo.objects.create(
                 nombre=p["nombre"],
                 precio=p["precio"],
-                imagen_url=p["imagen"],
+                imagen=p["imagen"],
                 categoria=cat,
                 esta_activo=True,
             )

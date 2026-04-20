@@ -1,10 +1,8 @@
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const Contact = () => {
-  const navigate = useNavigate();
-
   return (
     <div className="app-container animate-fade">
       <header style={{ marginBottom: '40px' }}>
@@ -113,7 +111,7 @@ const Contact = () => {
               <span className="material-icons-round">info</span>
               <span>Info</span>
           </Link>
-          <Link to="/admin/inventario" className="nav-item">
+          <Link to="/admin/pedidos" className="nav-item">
               <span className="material-icons-round">inventory_2</span>
               <span>Admin</span>
           </Link>

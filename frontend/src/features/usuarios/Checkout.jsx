@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { useCart } from '../../shared/CartContext';
+import { useCart } from '../../shared/cartHooks';
 
 const Checkout = () => {
   const { cart, total, clearCart } = useCart();

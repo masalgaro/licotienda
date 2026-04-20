@@ -24,4 +24,6 @@ class ProductoSerializer(serializers.ModelSerializer):
             "categoria_nombre",
             "esta_activo",
             "existencias",
+            "en_oferta",
+            "descuento_porcentaje",
         ]
