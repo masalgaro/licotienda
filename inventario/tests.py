@@ -98,3 +98,75 @@ class InventarioOfertaTests(TestCase):
         self.producto.refresh_from_db()
         self.assertFalse(self.producto.en_oferta)
         self.assertEqual(self.producto.descuento_porcentaje, 0)
+
+
+class InventarioCrearCategoriaTests(TestCase):
+    """Cobertura HU-15: Agregar categorías a productos."""
+
+    def test_happy_path_crea_categoria_nueva(self):
+        response = self.client.post(
+            "/api/v1/inventario/categorias/",
+            data={"nombre": "Tequilas Premium"},
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(CategoriaModelo.objects.filter(nombre="Tequilas Premium").exists())
+
+    def test_flujo_alterno_rechaza_categoria_duplicada(self):
+        CategoriaModelo.objects.create(nombre="Vinos")
+
+        response = self.client.post(
+            "/api/v1/inventario/categorias/",
+            data={"nombre": "Vinos"},
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("nombre", response.json())
+        self.assertEqual(CategoriaModelo.objects.filter(nombre__iexact="Vinos").count(), 1)
+
+
+class InventarioEditarCategoriaTests(TestCase):
+    """Cobertura HU-19: Editar categorías de productos existentes."""
+
+    def setUp(self):
+        self.categoria = CategoriaModelo.objects.create(nombre="Vinos Tintos")
+
+    def test_happy_path_edita_nombre_categoria(self):
+        response = self.client.put(
+            f"/api/v1/inventario/categorias/{self.categoria.id}/",
+            data={"nombre": "Vinos Reserva"},
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.categoria.refresh_from_db()
+        self.assertEqual(self.categoria.nombre, "Vinos Reserva")
+
+    def test_flujo_alterno_editar_categoria_inexistente_retorna_404(self):
+        response = self.client.put(
+            "/api/v1/inventario/categorias/99999/",
+            data={"nombre": "Nueva"},
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+
+class InventarioEliminarCategoriaTests(TestCase):
+    """Cobertura HU-22: Eliminar categorías de productos."""
+
+    def setUp(self):
+        self.categoria = CategoriaModelo.objects.create(nombre="Sodas")
+
+    def test_happy_path_elimina_categoria_sin_productos(self):
+        response = self.client.delete(f"/api/v1/inventario/categorias/{self.categoria.id}/")
+
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(CategoriaModelo.objects.filter(id=self.categoria.id).exists())
+
+    def test_flujo_alterno_eliminar_categoria_inexistente_retorna_404(self):
+        response = self.client.delete("/api/v1/inventario/categorias/99999/")
+
+        self.assertEqual(response.status_code, 404)
