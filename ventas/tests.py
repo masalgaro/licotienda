@@ -4,7 +4,6 @@ from django.test import TestCase
 
 from inventario.infraestructura.models import CategoriaModelo, ProductoModelo
 from usuarios.infraestructura.models import Usuario, UsuarioDireccion
-
 from ventas.infraestructura.models import Pedido
 
 

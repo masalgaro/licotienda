@@ -1,83 +1,83 @@
-# Sprint 2 - Testing
+# Sprint 2 - Pruebas
 
-## Overview
-Comprehensive test suite for OrdersAdminPage.jsx fixes implemented in this sprint.
+## Resumen
+Suite completa de pruebas para las correcciones de OrdersAdminPage.jsx implementadas en este sprint.
 
-## What was tested
-Tests verify 3 key fixes to OrdersAdminPage:
+## Qué se probó
+Las pruebas verifican 3 correcciones clave en OrdersAdminPage:
 
-### 1. Total Display Fix
-**Requirement**: Show `final_total` instead of `costo_envio`
-- **Test**: `debería mostrar final_total en la columna TOTAL`
-  - Verifies that order totals display as $56.000, $26.000, $16.000 (final_total)
-  - NOT just $6.000 (shipping cost)
-- **Test**: `debería calcular correctamente final_total = subtotal + shipping`
-  - Confirms Colombian number formatting (es-CO locale)
+### 1. Corrección de visualización del total
+**Requisito**: Mostrar `final_total` en lugar de `costo_envio`
+- **Prueba**: `debería mostrar final_total en la columna TOTAL`
+  - Verifica que los totales de pedidos se muestren como $56.000, $26.000, $16.000 (final_total)
+  - NO solo $6.000 (costo de envío)
+- **Prueba**: `debería calcular correctamente final_total = subtotal + shipping`
+  - Confirma el formato numérico colombiano (locale es-CO)
 
-### 2. Reject Button Functionality
-**Requirement**: Reject button opens modal with rejection form
-- **Test**: `debería abrir el modal cuando se hace click en el botón rechazar`
-  - Verifies modal opens and displays rejection textarea
-- **Test**: `debería mostrar el textarea de motivo solo para órdenes PAGO_SUBIDO`
-  - Confirms form only appears for refundable orders
-- **Test**: `debería permitir rechazar una orden con motivo` (Happy Path)
-  - End-to-end: add motivo → click Rechazar → API call with correct data
+### 2. Funcionalidad del botón rechazar
+**Requisito**: El botón rechazar abre un modal con formulario de rechazo
+- **Prueba**: `debería abrir el modal cuando se hace click en el botón rechazar`
+  - Verifica que el modal se abra y muestre el textarea de rechazo
+- **Prueba**: `debería mostrar el textarea de motivo solo para órdenes PAGO_SUBIDO`
+  - Confirma que el formulario solo aparece para pedidos reembolsables
+- **Prueba**: `debería permitir rechazar una orden con motivo` (Happy Path)
+  - Flujo completo: agregar motivo → clic en Rechazar → llamada a API con datos correctos
 
-### 3. Filter & State Management
-**Requirement**: Filters and action buttons work correctly
-- **Test**: `debería filtrar órdenes por estado`
-  - Click PAGO_SUBIDO filter → only shows PAGO_SUBIDO orders
-- **Test**: `debería mostrar botones aprobar/rechazar solo para estado PAGO_SUBIDO`
-  - Action buttons appear only for rejectable orders
+### 3. Filtros y gestión de estado
+**Requisito**: Los filtros y botones de acción funcionan correctamente
+- **Prueba**: `debería filtrar órdenes por estado`
+  - Clic en filtro PAGO_SUBIDO → solo muestra pedidos PAGO_SUBIDO
+- **Prueba**: `debería mostrar botones aprobar/rechazar solo para estado PAGO_SUBIDO`
+  - Los botones de acción aparecen únicamente para pedidos rechazables
 
-## Running Tests
+## Cómo correr las pruebas
 
 ```bash
-# Run all tests
+# Correr todas las pruebas
 npm test
 
-# Watch mode (rerun on file changes)
+# Modo watch (vuelve a correr al cambiar archivos)
 npm test -- --watch
 
-# UI mode (visual test runner)
+# Modo UI (corredor visual de pruebas)
 npm run test:ui
 ```
 
-## Test Statistics
-- **Total Tests**: 12
-- **Status**: ✅ All Passing
-- **Coverage**: OrdersAdminPage component rendering, data display, user interactions
+## Estadísticas de pruebas
+- **Total de pruebas**: 12
+- **Estado**: Todas pasando
+- **Cobertura**: Renderizado del componente OrdersAdminPage, visualización de datos, interacciones del usuario
 
-## Mocks & Setup
-- `axios` - Mocked for API calls, resolves with mockOrders data
-- `framer-motion` - Mocked to simplify JSX output (motion.div → div)
-- `react-router-dom` - Wrapped in BrowserRouter for Link components
+## Mocks y configuración
+- `axios` — Mockeado para llamadas a la API, resuelve con datos de mockOrders
+- `framer-motion` — Mockeado para simplificar la salida JSX (motion.div → div)
+- `react-router-dom` — Envuelto en BrowserRouter para componentes Link
 
-## Test Data
-Mock orders include:
-1. PAGO_SUBIDO order (final_total: $56.000) - with TRANSFERENCIA payment
-2. PAGO_VERIFICADO order (final_total: $26.000) - already approved
-3. PENDIENTE_PAGO order (final_total: $16.000) - with EFECTIVO payment
+## Datos de prueba
+Los pedidos mock incluyen:
+1. Pedido PAGO_SUBIDO (final_total: $56.000) — con pago TRANSFERENCIA
+2. Pedido PAGO_VERIFICADO (final_total: $26.000) — ya aprobado
+3. Pedido PENDIENTE_PAGO (final_total: $16.000) — con pago EFECTIVO
 
-## Key Testing Patterns
+## Patrones de prueba clave
 
-### Data Assertions
+### Verificación de datos
 ```javascript
 expect(screen.getByText('$56.000')).toBeInTheDocument();
 ```
 
-### User Interactions
+### Interacciones del usuario
 ```javascript
 fireEvent.click(rejectButton);
 fireEvent.change(textarea, { target: { value: 'Motivo...' } });
 ```
 
-### Async Data Loading
+### Carga de datos asíncrona
 ```javascript
 await screen.findByText('Cliente Prueba 1');
 ```
 
-### API Verification
+### Verificación de llamadas a la API
 ```javascript
 expect(axios.post).toHaveBeenCalledWith(
   expect.stringContaining('gestionar-pago'),
@@ -85,7 +85,7 @@ expect(axios.post).toHaveBeenCalledWith(
 );
 ```
 
-## Next Steps
-- Add integration tests for Checkout flow
-- Add tests for CartPage item management
-- Increase coverage to 80%+ across all components
+## Próximos pasos
+- Agregar pruebas de integración para el flujo de Checkout
+- Agregar pruebas para la gestión de ítems en CartPage
+- Aumentar la cobertura al 80%+ en todos los componentes
