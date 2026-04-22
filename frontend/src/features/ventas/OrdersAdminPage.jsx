@@ -257,9 +257,7 @@ const OrdersAdminPage = () => {
             const res = await axios.get('http://127.0.0.1:8000/api/v1/ventas/todos/');
             setPedidos(res.data);
         } catch (_err) {
-        } catch (_err) {
             console.error('Error fetching orders:', _err);
-        }
         }
     };
 
@@ -285,9 +283,7 @@ const OrdersAdminPage = () => {
                 setMotivoRechazo('');
             }
         } catch {
-        } catch {
             alert('Error al procesar la acción');
-        }
         }
     };
 
