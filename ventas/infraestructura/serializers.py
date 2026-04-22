@@ -4,9 +4,11 @@ from .models import ItemPedido, Pedido
 
 
 class ItemPedidoSerializer(serializers.ModelSerializer):
+    producto_nombre = serializers.CharField(source="producto.nombre", read_only=True)
+
     class Meta:
         model = ItemPedido
-        fields = ["producto", "cantidad", "precio"]
+        fields = ["producto", "producto_nombre", "cantidad", "precio"]
 
 
 class PedidoSerializer(serializers.ModelSerializer):

@@ -19,6 +19,7 @@ class ListarProductosView(APIView):
     def get(self, request):
         query = request.query_params.get("q", "")
         categoria_id = request.query_params.get("categoria", None)
+        en_oferta = request.query_params.get("en_oferta")
 
         productos = ProductoModelo.objects.filter(esta_activo=True)
 
@@ -29,6 +30,11 @@ class ListarProductosView(APIView):
 
         if categoria_id:
             productos = productos.filter(categoria_id=categoria_id)
+
+        if en_oferta is not None:
+            en_oferta_normalizado = en_oferta.strip().lower()
+            if en_oferta_normalizado in {"true", "false"}:
+                productos = productos.filter(en_oferta=en_oferta_normalizado == "true")
 
         serializer = ProductoSerializer(productos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

@@ -24,11 +24,33 @@ class ProductoInventarioSerializer(serializers.ModelSerializer):
         return value
 
 
+
     def validate(self, attrs):
         if not self.instance and not attrs.get("imagen"):
             raise serializers.ValidationError(
                 {"imagen": "Se requiere subir una imagen para los nuevos productos."}
             )
+
+        en_oferta = attrs.get("en_oferta")
+        descuento_porcentaje = attrs.get("descuento_porcentaje")
+
+        if self.instance:
+            if en_oferta is None:
+                en_oferta = self.instance.en_oferta
+            if descuento_porcentaje is None:
+                descuento_porcentaje = self.instance.descuento_porcentaje
+
+        en_oferta = bool(en_oferta)
+        descuento_porcentaje = int(descuento_porcentaje or 0)
+
+        if en_oferta and descuento_porcentaje <= 0:
+            raise serializers.ValidationError(
+                {"descuento_porcentaje": "Una oferta activa requiere un descuento entre 1 y 100."}
+            )
+
+        if not en_oferta:
+            attrs["descuento_porcentaje"] = 0
+
         return attrs
 
     def to_internal_value(self, data):

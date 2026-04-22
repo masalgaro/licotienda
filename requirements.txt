@@ -32,3 +32,6 @@ kiwisolver==1.5.0
 
 # Calidad de Código y Estándares
 ruff==0.15.7
+
+# Cobertura de Pruebas
+coverage==7.8.0
