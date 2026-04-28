@@ -278,6 +278,22 @@ const OrdersAdminPage = () => {
                 motivo: motivoRechazo,
             });
             if (res.data.exito) {
+                if (accion === 'aprobar') {
+                    const pedido = pedidos.find(p => p.id === pedidoId);
+                    if (pedido) {
+                        const NUMERO_NEGOCIO = '573015456939';
+                        
+                        let itemsTexto = '';
+                        if (pedido.items && pedido.items.length > 0) {
+                            itemsTexto = '\n\n📦 *Productos:*\n' + pedido.items.map(item => 
+                                `▫️ ${item.cantidad}x ${item.producto_nombre || `Producto #${item.producto}`}`
+                            ).join('\n');
+                        }
+
+                        const mensaje = `¡Nuevo pedido aprobado! 🚀\n\n📌 Pedido: #${pedido.id}\n👤 Cliente: ${pedido.cliente || 'Invitado'}${itemsTexto}\n\n💰 Total: $${pedido.final_total}\n\nPor favor, preparar el pedido.`;
+                        window.open(`https://wa.me/${NUMERO_NEGOCIO}?text=${encodeURIComponent(mensaje)}`, '_blank');
+                    }
+                }
                 fetchOrders();
                 setDetailOrder(null);
                 setMotivoRechazo('');
