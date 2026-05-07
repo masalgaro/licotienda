@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -59,10 +59,10 @@ const InventoryAdminPage = () => {
     const [currentProduct, setCurrentProduct] = useState(EMPTY_PRODUCT);
     const [offerDraft, setOfferDraft] = useState(EMPTY_OFFER);
 
-    const fetchData = async (vistaActual = vistaProductos) => {
+    const fetchData = useCallback(async () => {
         try {
             const [prodRes, catRes] = await Promise.all([
-                axios.get(buildProductsUrl(vistaActual)),
+                axios.get(buildProductsUrl(vistaProductos)),
                 axios.get(`${API_BASE_URL}/api/v1/inventario/categorias/`)
             ]);
             setProductos(prodRes.data);
@@ -70,11 +70,12 @@ const InventoryAdminPage = () => {
         } catch (_err) {
             console.error("Error admin fetching:", _err);
         }
-    };
+    }, [vistaProductos]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchData();
-    }, [vistaProductos]);
+    }, [fetchData]);
 
     const stats = {
         total: productos.length,

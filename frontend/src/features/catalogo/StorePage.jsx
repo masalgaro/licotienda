@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { WHATSAPP_SOPORTE } from '../../config';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -185,7 +186,7 @@ const StorePage = () => {
                            </div>
 
                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
-                                <a href="https://wa.me/573005545711" target="_blank" rel="noreferrer" className="glass-card" style={{ padding: '16px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(37, 211, 102, 0.05)' }}>
+                                <a href={`https://wa.me/${WHATSAPP_SOPORTE}`} target="_blank" rel="noreferrer" className="glass-card" style={{ padding: '16px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(37, 211, 102, 0.05)' }}>
                                     <span className="material-icons-round" style={{ color: '#25D366', fontSize: '20px' }}>message</span>
                                     <span style={{ fontWeight: 600, fontSize: '0.8rem' }}>WhatsApp</span>
                                 </a>

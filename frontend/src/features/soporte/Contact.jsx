@@ -1,4 +1,5 @@
 import React from 'react';
+import { WHATSAPP_SOPORTE } from '../../config';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -15,7 +16,7 @@ const Contact = () => {
          <motion.a 
            whileHover={{ scale: 1.02 }}
            whileTap={{ scale: 0.96 }}
-           href="https://wa.me/573005545711" 
+           href={`https://wa.me/${WHATSAPP_SOPORTE}`} 
            target="_blank" 
            rel="noreferrer"
            className="glass-card" 
@@ -51,7 +52,7 @@ const Contact = () => {
          <motion.a 
            whileHover={{ scale: 1.02 }}
            whileTap={{ scale: 0.96 }}
-           href="tel:+573005545711"
+           href={`tel:+${WHATSAPP_SOPORTE}`}
            className="glass-card" 
            style={{ padding: '28px', display: 'flex', alignItems: 'center', gap: '16px', textDecoration: 'none', cursor: 'pointer' }}
          >

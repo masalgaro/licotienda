@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { WHATSAPP_SOPORTE } from '../../config';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -188,7 +189,7 @@ const Checkout = () => {
                             
                             <div className="glass-card" style={{ padding: '24px' }}>
                                 <p className="label-caps" style={{ marginBottom: '16px', fontSize: '0.65rem' }}>WhatsApp & Soporte</p>
-                                <a href="https://wa.me/573005545711" target="_blank" rel="noreferrer" style={{ textDecoration: 'none', display: 'flex', gap: '16px', color: 'inherit' }}>
+                                <a href={`https://wa.me/${WHATSAPP_SOPORTE}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', display: 'flex', gap: '16px', color: 'inherit' }}>
                                     <span className="material-icons-round" style={{ color: '#25D366' }}>message</span>
                                     <p style={{ fontWeight: 800, margin: 0 }}>+57 300 554 57 11</p>
                                 </a>

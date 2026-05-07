@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { WHATSAPP_NEGOCIO } from '../../../config';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -281,7 +282,7 @@ const OrdersAdminPage = () => {
                 if (accion === 'aprobar') {
                     const pedido = pedidos.find(p => p.id === pedidoId);
                     if (pedido) {
-                        const NUMERO_NEGOCIO = '573015456939';
+                        const NUMERO_NEGOCIO = WHATSAPP_NEGOCIO;
                         
                         let itemsTexto = '';
                         if (pedido.items && pedido.items.length > 0) {
