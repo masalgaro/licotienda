@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { Plus, ToggleLeft, ToggleRight, Edit2, Trash2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Plus, ToggleLeft, ToggleRight, Edit2, Trash2, LogOut } from 'lucide-react';
 
 const API_BASE_URL = 'http://127.0.0.1:8000';
 const VISTA_TODOS = 'todos';
@@ -43,6 +43,7 @@ const buildProductsUrl = (vistaProductos) => {
 };
 
 const InventoryAdminPage = () => {
+    const navigate = useNavigate();
     const [productos, setProductos] = useState([]);
     const [categorias, setCategorias] = useState([]);
     const [vistaProductos, setVistaProductos] = useState(VISTA_TODOS);
@@ -320,6 +321,21 @@ const InventoryAdminPage = () => {
                             onClick={handleNewProduct}
                         >
                             <Plus size={20} /> Nuevo Producto
+                        </button>
+                        <button
+                            className="btn-primary"
+                            style={{
+                                width: 'auto',
+                                padding: '12px 24px',
+                                background: 'var(--surface-high)',
+                                color: 'var(--text-secondary)',
+                                border: '1px solid var(--border)',
+                                display: 'flex',
+                                gap: '8px'
+                            }}
+                            onClick={() => { localStorage.removeItem('admin_token'); navigate('/admin/login', { replace: true }); }}
+                        >
+                            <LogOut size={20} /> Cerrar sesión
                         </button>
                     </div>
                 </header>
