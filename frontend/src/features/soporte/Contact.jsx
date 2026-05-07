@@ -112,10 +112,6 @@ const Contact = () => {
               <span className="material-icons-round">info</span>
               <span>Info</span>
           </Link>
-          <Link to="/admin/pedidos" className="nav-item">
-              <span className="material-icons-round">inventory_2</span>
-              <span>Admin</span>
-          </Link>
       </nav>
     </div>
   );

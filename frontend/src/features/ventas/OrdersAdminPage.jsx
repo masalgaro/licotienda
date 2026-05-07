@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { WHATSAPP_NEGOCIO } from '../../../config';
+import { WHATSAPP_NEGOCIO } from '../../config';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { LogOut } from 'lucide-react';
 
 const fmt = n => new Intl.NumberFormat('es-CO').format(n);
 
@@ -248,6 +249,7 @@ const OrderDetailModal = ({ pedido, motivoRechazo, setMotivoRechazo, onClose, on
 };
 
 const OrdersAdminPage = () => {
+    const navigate = useNavigate();
     const [pedidos, setPedidos] = useState([]);
     const [filtro, setFiltro] = useState('TODOS');
     const [detailOrder, setDetailOrder] = useState(null);
@@ -338,9 +340,27 @@ const OrdersAdminPage = () => {
 
     return (
         <div className="app-container animate-fade">
-            <header style={{ marginBottom: '40px' }}>
-                <p className="label-caps" style={{ color: 'var(--primary-green)', marginBottom: '8px' }}>Control de Ventas</p>
-                <h1 className="display-lg" style={{ margin: 0 }}>Gestión de Pedidos</h1>
+            <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                    <p className="label-caps" style={{ color: 'var(--primary-green)', marginBottom: '8px' }}>Control de Ventas</p>
+                    <h1 className="display-lg" style={{ margin: 0 }}>Gestión de Pedidos</h1>
+                </div>
+                <button
+                    className="btn-primary"
+                    style={{
+                        width: 'auto',
+                        padding: '12px 24px',
+                        background: 'var(--surface-high)',
+                        color: 'var(--text-secondary)',
+                        border: '1px solid var(--border)',
+                        display: 'flex',
+                        gap: '8px',
+                        alignItems: 'center',
+                    }}
+                    onClick={() => { localStorage.removeItem('admin_token'); navigate('/admin/login', { replace: true }); }}
+                >
+                    <LogOut size={20} /> Cerrar sesión
+                </button>
             </header>
 
             {/* Filters */}

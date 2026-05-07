@@ -5,10 +5,12 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import StorePage from './features/catalogo/StorePage';
 import CartPage from './features/ventas/CartPage';
 import Checkout from './features/usuarios/Checkout';
+import AdminLoginPage from './features/usuarios/AdminLoginPage';
 import PaymentSupport from './features/soporte/PaymentSupport';
 import Contact from './features/soporte/Contact';
 import InventoryAdminPage from './features/inventario/InventoryAdminPage';
 import OrdersAdminPage from './features/ventas/OrdersAdminPage';
+import PrivateRoute from './shared/PrivateRoute';
 
 function App() {
     return (
@@ -19,8 +21,9 @@ function App() {
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/pago" element={<PaymentSupport />} />
                 <Route path="/contacto" element={<Contact />} />
-                <Route path="/admin/inventario" element={<InventoryAdminPage />} />
-                <Route path="/admin/pedidos" element={<OrdersAdminPage />} />
+                <Route path="/admin/login" element={<AdminLoginPage />} />
+                <Route path="/admin/inventario" element={<PrivateRoute><InventoryAdminPage /></PrivateRoute>} />
+                <Route path="/admin/pedidos" element={<PrivateRoute><OrdersAdminPage /></PrivateRoute>} />
             </Routes>
         </Router>
     );
