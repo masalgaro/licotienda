@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     "catalogo",
     "inventario",
     "ventas",
+    "granizados",
 ]
 
 MIDDLEWARE = [
