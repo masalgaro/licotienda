@@ -5,6 +5,7 @@ from .infraestructura.views import (
     InventarioCategoriaListCreateView,
     InventarioProductoDetailView,
     InventarioProductoListCreateView,
+    SurtirInventarioView,
 )
 
 urlpatterns = [
@@ -20,4 +21,5 @@ urlpatterns = [
         InventarioCategoriaDetailView.as_view(),
         name="inventario_categoria_detalle",
     ),
+    path("surtir/", SurtirInventarioView.as_view(), name="inventario_surtir"),
 ]

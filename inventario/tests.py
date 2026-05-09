@@ -170,3 +170,62 @@ class InventarioEliminarCategoriaTests(TestCase):
         response = self.client.delete("/api/v1/inventario/categorias/99999/")
 
         self.assertEqual(response.status_code, 404)
+
+
+class SurtirInventarioTests(TestCase):
+    """CP-HU26-01, CP-HU26-02, CP-HU26-03"""
+
+    def setUp(self):
+        self.categoria = CategoriaModelo.objects.create(nombre="Rones")
+        self.producto1 = ProductoModelo.objects.create(
+            nombre="Ron Medellín",
+            precio=50000,
+            categoria=self.categoria,
+            existencias=10,
+            esta_activo=True,
+        )
+        self.producto2 = ProductoModelo.objects.create(
+            nombre="Ron Viejo de Caldas",
+            precio=35000,
+            categoria=self.categoria,
+            existencias=5,
+            esta_activo=True,
+        )
+        self.url = "/api/v1/inventario/surtir/"
+
+    def test_surtido_valido_incrementa_existencias(self):
+        """CP-HU26-01: surtido válido de múltiples productos retorna 200 y stocks actualizados"""
+        payload = {
+            "items": [
+                {"producto_id": self.producto1.pk, "cantidad_adicional": 20},
+                {"producto_id": self.producto2.pk, "cantidad_adicional": 15},
+            ]
+        }
+        response = self.client.post(
+            self.url, data=payload, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.producto1.refresh_from_db()
+        self.producto2.refresh_from_db()
+        self.assertEqual(self.producto1.existencias, 30)
+        self.assertEqual(self.producto2.existencias, 20)
+
+    def test_cantidad_cero_retorna_400(self):
+        """CP-HU26-02: cantidad_adicional = 0 es rechazado con HTTP 400"""
+        payload = {
+            "items": [{"producto_id": self.producto1.pk, "cantidad_adicional": 0}]
+        }
+        response = self.client.post(
+            self.url, data=payload, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_producto_inexistente_retorna_400(self):
+        """CP-HU26-03: producto_id que no existe retorna HTTP 400"""
+        payload = {
+            "items": [{"producto_id": 99999, "cantidad_adicional": 10}]
+        }
+        response = self.client.post(
+            self.url, data=payload, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
