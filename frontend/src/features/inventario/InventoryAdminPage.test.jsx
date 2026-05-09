@@ -146,3 +146,58 @@ describe('InventoryAdminPage ofertas', () => {
     });
   });
 });
+
+describe('InventoryAdminPage surtir inventario', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    window.alert = vi.fn();
+    window.confirm = vi.fn(() => true);
+    window.prompt = vi.fn();
+
+    axios.get.mockImplementation((url) => {
+      if (url.includes('/inventario/categorias/')) {
+        return Promise.resolve({ data: categorias });
+      }
+      return Promise.resolve({ data: productosBase });
+    });
+
+    axios.post.mockResolvedValue({ data: { actualizados: [] } });
+  });
+
+  it('CP-HU26-04: muestra tabla de surtido con stock actual de cada producto', async () => {
+    renderInventoryPage();
+
+    await screen.findByText('Ron Dorado');
+
+    fireEvent.click(screen.getByText('Surtir stock'));
+
+    expect(await screen.findByTestId('tabla-surtir')).toBeInTheDocument();
+    expect(screen.getByText('Ron Dorado')).toBeInTheDocument();
+    expect(screen.getByText('Whisky Reserva')).toBeInTheDocument();
+    expect(screen.getByTestId(`input-surtir-${productosBase[0].id}`)).toBeInTheDocument();
+    expect(screen.getByTestId(`input-surtir-${productosBase[1].id}`)).toBeInTheDocument();
+  });
+
+  it('CP-HU26-05: aplica surtido solo con productos que tienen cantidad mayor a cero', async () => {
+    renderInventoryPage();
+
+    await screen.findByText('Ron Dorado');
+
+    fireEvent.click(screen.getByText('Surtir stock'));
+
+    await screen.findByTestId('tabla-surtir');
+
+    fireEvent.change(screen.getByTestId(`input-surtir-${productosBase[0].id}`), {
+      target: { value: '5' },
+    });
+
+    fireEvent.click(screen.getByTestId('btn-aplicar-surtido'));
+
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith(
+        'http://127.0.0.1:8000/api/v1/inventario/surtir/',
+        { items: [{ producto_id: productosBase[0].id, cantidad_adicional: 5 }] }
+      );
+    });
+  });
+});
