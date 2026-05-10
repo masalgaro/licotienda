@@ -145,3 +145,22 @@ class CategoriaInventarioSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"La categoría '{value}' ya existe.")
 
         return value
+
+
+class SurtirItemSerializer(serializers.Serializer):
+    producto_id = serializers.IntegerField()
+    cantidad_adicional = serializers.IntegerField(min_value=1)
+
+    def validate_producto_id(self, value):
+        if not ProductoModelo.objects.filter(pk=value).exists():
+            raise serializers.ValidationError(f"No existe un producto con id {value}.")
+        return value
+
+
+class SurtirBulkSerializer(serializers.Serializer):
+    items = SurtirItemSerializer(many=True)
+
+    def validate_items(self, value):
+        if not value:
+            raise serializers.ValidationError("Debes enviar al menos un producto.")
+        return value

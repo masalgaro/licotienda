@@ -47,6 +47,8 @@ const InventoryAdminPage = () => {
     const [productos, setProductos] = useState([]);
     const [categorias, setCategorias] = useState([]);
     const [vistaProductos, setVistaProductos] = useState(VISTA_TODOS);
+    const [modo, setModo] = useState("productos"); // "productos" | "surtir"
+    const [cantidadesSurtir, setCantidadesSurtir] = useState({});
 
     const [showModal, setShowModal] = useState(false);
     const [showOfferModal, setShowOfferModal] = useState(false);
@@ -274,6 +276,26 @@ const InventoryAdminPage = () => {
         }
     };
 
+    const handleSurtir = async () => {
+        const items = Object.entries(cantidadesSurtir)
+            .filter(([, v]) => Number(v) > 0)
+            .map(([producto_id, cantidad_adicional]) => ({
+                producto_id: Number(producto_id),
+                cantidad_adicional: Number(cantidad_adicional),
+            }));
+        if (items.length === 0) {
+            alert("Ingresa al menos una cantidad mayor a 0.");
+            return;
+        }
+        try {
+            await axios.post(`${API_BASE_URL}/api/v1/inventario/surtir/`, { items });
+            await fetchData();
+            setCantidadesSurtir({});
+        } catch (_err) {
+            alert(_err.response?.data?.detail || JSON.stringify(_err.response?.data || "Error al surtir."));
+        }
+    };
+
     const descuentoOferta = parseInt(offerDraft.descuento_porcentaje, 10);
     const descuentoValido =
         !offerDraft.en_oferta || (!Number.isNaN(descuentoOferta) && descuentoOferta >= 1 && descuentoOferta <= 100);
@@ -321,6 +343,22 @@ const InventoryAdminPage = () => {
                             onClick={handleNewProduct}
                         >
                             <Plus size={20} /> Nuevo Producto
+                        </button>
+                        <button
+                            className="btn-primary"
+                            style={{
+                                width: 'auto',
+                                padding: '12px 24px',
+                                display: 'flex',
+                                gap: '8px',
+                                background: modo === "surtir" ? 'var(--primary-green)' : 'var(--surface-high)',
+                                color: modo === "surtir" ? '#000' : 'var(--primary-green)',
+                                border: '1px solid var(--primary-green)',
+                                boxShadow: modo === "surtir" ? '0 0 18px rgba(0,255,140,0.25)' : '0 0 15px rgba(0,255,140,0.1)',
+                            }}
+                            onClick={() => setModo(modo === "surtir" ? "productos" : "surtir")}
+                        >
+                            <Plus size={20} /> Surtir inventario
                         </button>
                         <button
                             className="btn-primary"
@@ -402,6 +440,8 @@ const InventoryAdminPage = () => {
                     </div>
                 </div>
 
+                {modo === "productos" && (
+                <>
                 <div
                     className="hide-scrollbar"
                     style={{
@@ -705,6 +745,89 @@ const InventoryAdminPage = () => {
                         </div>
                     )}
                 </div>
+                </>
+                )}
+
+                {modo === "surtir" && (
+                <div className="glass-card" style={{ padding: 'var(--spacing-xl)' }}>
+                    <h2 style={{ marginBottom: '24px' }}>Surtir productos</h2>
+                    <table
+                        data-testid="tabla-surtir"
+                        style={{ borderCollapse: 'collapse', width: '100%', textAlign: 'left' }}
+                    >
+                        <thead>
+                            <tr
+                                style={{
+                                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                    background: 'rgba(255,255,255,0.02)',
+                                }}
+                            >
+                                <th
+                                    style={{ padding: '16px 20px', color: 'var(--text-secondary)' }}
+                                    className="label-caps"
+                                >
+                                    Producto
+                                </th>
+                                <th
+                                    style={{ padding: '16px 20px', color: 'var(--text-secondary)' }}
+                                    className="label-caps"
+                                >
+                                    Stock actual
+                                </th>
+                                <th
+                                    style={{ padding: '16px 20px', color: 'var(--text-secondary)' }}
+                                    className="label-caps"
+                                >
+                                    Cantidad a agregar
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {productos.map((producto) => (
+                                <tr
+                                    key={producto.id}
+                                    style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}
+                                >
+                                    <td style={{ padding: '12px 20px', fontWeight: 600 }}>
+                                        {producto.nombre}
+                                    </td>
+                                    <td style={{ padding: '12px 20px' }}>
+                                        {producto.existencias} und
+                                    </td>
+                                    <td style={{ padding: '12px 20px' }}>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            placeholder="0"
+                                            value={cantidadesSurtir[producto.id] || ""}
+                                            onChange={(e) =>
+                                                setCantidadesSurtir((prev) => ({
+                                                    ...prev,
+                                                    [producto.id]: e.target.value,
+                                                }))
+                                            }
+                                            data-testid={`input-surtir-${producto.id}`}
+                                            className="premium-input"
+                                            style={{ width: '100px', padding: '8px' }}
+                                        />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    <div style={{ marginTop: '24px' }}>
+                        <button
+                            type="button"
+                            className="btn-primary"
+                            style={{ width: 'auto', padding: '12px 28px' }}
+                            onClick={handleSurtir}
+                            data-testid="btn-aplicar-surtido"
+                        >
+                            Aplicar surtido
+                        </button>
+                    </div>
+                </div>
+                )}
             </div>
 
             <AnimatePresence>
