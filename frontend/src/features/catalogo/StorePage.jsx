@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { WHATSAPP_SOPORTE } from '../../config';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { useCart } from '../../shared/cartHooks';
 
@@ -27,6 +27,7 @@ const buildCatalogUrl = (query, categoriaId, soloOfertas) => {
 };
 
 const StorePage = () => {
+    const navigate = useNavigate();
     const { itemCount, addToCart, total } = useCart();
     const [productos, setProductos] = useState([]);
     const [categorias, setCategorias] = useState([]);
@@ -210,6 +211,31 @@ const StorePage = () => {
                                 loading="lazy" 
                             ></iframe>
                         </div>
+                    </div>
+                </motion.div>
+
+                {/* Granizado Builder Banner */}
+                <motion.div 
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => navigate('/armar-granizado')}
+                    style={{
+                        background: 'linear-gradient(135deg, rgba(57, 181, 74, 0.15) 0%, rgba(0,0,0,0.5) 100%)',
+                        border: '1px solid var(--primary-green)',
+                        borderRadius: '24px', padding: '24px', marginBottom: '32px',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '24px',
+                        position: 'relative', overflow: 'hidden'
+                    }}
+                >
+                    <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.1, transform: 'rotate(15deg)' }}>
+                        <span className="material-icons-round" style={{ fontSize: '150px', color: 'var(--primary-green)' }}>local_drink</span>
+                    </div>
+                    <div style={{ background: 'var(--surface-high)', padding: '16px', borderRadius: '16px', zIndex: 1 }}>
+                        <span className="material-icons-round" style={{ fontSize: '32px', color: 'var(--primary-green)' }}>local_drink</span>
+                    </div>
+                    <div style={{ zIndex: 1 }}>
+                        <h2 style={{ fontSize: '1.4rem', fontWeight: 800, margin: '0 0 4px 0' }}>¡Arma tu Granizado!</h2>
+                        <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '0.9rem' }}>Personaliza tu bebida con tus licores y toppings favoritos.</p>
                     </div>
                 </motion.div>
 
