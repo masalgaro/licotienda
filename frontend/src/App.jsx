@@ -11,6 +11,7 @@ import PaymentSupport from './features/soporte/PaymentSupport';
 import Contact from './features/soporte/Contact';
 import InventoryAdminPage from './features/inventario/InventoryAdminPage';
 import OrdersAdminPage from './features/ventas/OrdersAdminPage';
+import GranizadosAdminPage from './features/catalogo/GranizadosAdminPage';
 import PrivateRoute from './shared/PrivateRoute';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
                 <Route path="/admin/login" element={<AdminLoginPage />} />
                 <Route path="/admin/inventario" element={<PrivateRoute><InventoryAdminPage /></PrivateRoute>} />
                 <Route path="/admin/pedidos" element={<PrivateRoute><OrdersAdminPage /></PrivateRoute>} />
+                <Route path="/admin/granizados" element={<PrivateRoute><GranizadosAdminPage /></PrivateRoute>} />
             </Routes>
         </Router>
     );

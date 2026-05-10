@@ -84,6 +84,12 @@ class CrearGranizadoSerializer(serializers.Serializer):
         return granizado
 
 
+class AdminIngredienteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingrediente
+        fields = ["id", "nombre", "categoria", "precio_adicional", "disponible"]
+
+
 class AgregarGranizadoCarritoSerializer(serializers.Serializer):
     granizado_id = serializers.IntegerField(min_value=1)
 

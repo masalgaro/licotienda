@@ -490,6 +490,10 @@ const OrdersAdminPage = () => {
                     <span className="material-icons-round">inventory_2</span>
                     <span>Inventario</span>
                 </Link>
+                <Link to="/admin/granizados" className="nav-item">
+                    <span className="material-icons-round">local_drink</span>
+                    <span>Granizados</span>
+                </Link>
             </nav>
         </div>
     );

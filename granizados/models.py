@@ -1,3 +1,3 @@
-from .infraestructura.models import *
+from .infraestructura.models import PRECIO_BASE_GRANIZADO, Granizado, Ingrediente
 
-# Create your models here.
+__all__ = ["Granizado", "Ingrediente", "PRECIO_BASE_GRANIZADO"]
