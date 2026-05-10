@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -137,3 +138,42 @@ class InventarioCategoriaDetailView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class SurtirInventarioView(APIView):
+    """
+    HU-26: Surtir inventario en bulk.
+    POST /api/v1/inventario/surtir/
+    Body: {"items": [{"producto_id": 1, "cantidad_adicional": 10}, ...]}
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        from .serializers import SurtirBulkSerializer
+
+        serializer = SurtirBulkSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        items = serializer.validated_data["items"]
+        resultados = []
+
+        with transaction.atomic():
+            ids = [item["producto_id"] for item in items]
+            productos = {
+                p.pk: p
+                for p in ProductoModelo.objects.select_for_update().filter(pk__in=ids)
+            }
+            for item in items:
+                producto = productos[item["producto_id"]]
+                producto.existencias += item["cantidad_adicional"]
+                if producto.existencias > 0:
+                    producto.esta_activo = True
+                producto.save(update_fields=["existencias", "esta_activo"])
+                resultados.append({
+                    "producto_id": producto.pk,
+                    "nombre": producto.nombre,
+                    "existencias_nuevas": producto.existencias,
+                })
+
+        return Response({"actualizados": resultados}, status=status.HTTP_200_OK)
