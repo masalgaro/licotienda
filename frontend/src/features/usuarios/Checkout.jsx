@@ -450,11 +450,11 @@ const Checkout = () => {
                                 <span className="text-secondary">{item.nombre} <small style={{ opacity: 0.6 }}>x{item.quantity}</small></span>
                                 <span style={{ fontWeight: 600 }}>${new Intl.NumberFormat('es-CO').format(item.precio * item.quantity)}</span>
                             </div>
-                            {item.is_granizado && item.ingredientes && (
+                            {item.tipo === 'granizado' && item.ingredientes?.length > 0 && (
                                 <div style={{ marginTop: '4px', paddingLeft: '8px', borderLeft: '2px solid rgba(255,255,255,0.1)' }}>
                                     {item.ingredientes.map((ing, idx) => (
                                         <div key={idx} style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                            • {ing.name}
+                                            • {ing.nombre}
                                         </div>
                                     ))}
                                 </div>

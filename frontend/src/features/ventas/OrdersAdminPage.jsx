@@ -130,19 +130,19 @@ const OrderDetailModal = ({ pedido, motivoRechazo, setMotivoRechazo, onClose, on
                                             x{item.cantidad}
                                         </span>
                                         <span style={{ fontSize: '0.87rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                            {item.is_granizado && <span className="material-icons-round" style={{ color: 'var(--primary-green)', fontSize: '16px' }}>local_drink</span>}
-                                            {item.producto_nombre || `Producto #${item.producto}`}
+                                            {item.tipo === 'granizado' && <span className="material-icons-round" style={{ color: 'var(--primary-green)', fontSize: '16px' }}>local_drink</span>}
+                                            {item.granizado_nombre || item.producto_nombre || `Item #${item.granizado || item.producto}`}
                                         </span>
                                     </div>
                                     <span style={{ fontSize: '0.87rem', fontWeight: 700, color: 'var(--text-primary)', flexShrink: 0 }}>
                                         ${fmt(parseFloat(item.precio) * item.cantidad)}
                                     </span>
                                 </div>
-                                {item.is_granizado && item.ingredientes && (
+                                {item.tipo === 'granizado' && item.granizado_ingredientes?.length > 0 && (
                                     <div style={{ marginTop: '8px', paddingLeft: '50px' }}>
                                         <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                            {item.ingredientes.map((ing, i) => (
-                                                <li key={i}>• {ing.name}</li>
+                                            {item.granizado_ingredientes.map((ing, i) => (
+                                                <li key={i}>• {ing.nombre}</li>
                                             ))}
                                         </ul>
                                     </div>
@@ -321,7 +321,7 @@ const OrdersAdminPage = () => {
     const filteredPedidos = pedidos.filter(p => filtro === 'TODOS' || p.estado === filtro);
 
     const renderProductosCell = pedido => {
-        const names = (pedido.items || []).map(i => i.producto_nombre).filter(Boolean);
+        const names = (pedido.items || []).map(i => i.granizado_nombre || i.producto_nombre).filter(Boolean);
         const preview = names.length === 0
             ? '—'
             : names.length <= 2

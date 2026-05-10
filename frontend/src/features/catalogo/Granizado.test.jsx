@@ -7,27 +7,29 @@ import { MemoryRouter } from 'react-router-dom';
 
 import axios from 'axios';
 
-// Mock the cart hook
+// Mock the cart hook with the real backend cart item structure
 vi.mock('../../shared/cartHooks', () => ({
     useCart: () => ({
         cart: [
             {
-                id: 'g1',
-                is_granizado: true,
-                nombre: 'Granizado con Licor (Grande)',
-                precio: 16000,
+                tipo: 'granizado',
+                id: 'granizado-1',
+                granizado: 1,
+                nombre: 'Granizado con alcohol',
+                precio: '16000.00',
                 quantity: 1,
+                tiene_alcohol: true,
                 ingredientes: [
-                    { category: 'Base', name: 'Mora Azul' },
-                    { category: 'Bolas Explosivas', name: 'Cereza' }
-                ]
-            }
+                    { id: 1, nombre: 'Mora Azul', categoria: 'fruta', precio_adicional: '0.00', disponible: true },
+                    { id: 2, nombre: 'Cereza', categoria: 'complemento', precio_adicional: '4000.00', disponible: true },
+                ],
+            },
         ],
         total: 16000,
         itemCount: 1,
         clearCart: vi.fn(),
-        addToCart: vi.fn()
-    })
+        addToCart: vi.fn(),
+    }),
 }));
 
 vi.mock('axios');
@@ -35,31 +37,33 @@ vi.mock('axios');
 describe('HU-24: Frontend Armar Granizado', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        // Mock the admin orders API — structure matches backend ItemPedidoSerializer
         axios.get.mockResolvedValue({
             data: [
                 {
                     id: 101,
                     fecha: '2023-10-10',
-                    estado: 'pendiente',
-                    cliente: 'Juan Perez',
-                    telefono: '3000000000',
+                    estado: 'PENDIENTE_PAGO',
+                    cliente: 1,
                     direccion: 'Calle 123',
                     total: 16000,
                     items: [
                         {
-                            id: 1,
-                            producto_nombre: 'Granizado con Licor (Grande)',
+                            producto: null,
+                            producto_nombre: null,
+                            granizado: 1,
+                            granizado_nombre: 'Granizado con alcohol',
+                            granizado_ingredientes: [
+                                { id: 1, nombre: 'Mora Azul', categoria: 'fruta', precio_adicional: '0.00' },
+                                { id: 2, nombre: 'Cereza', categoria: 'complemento', precio_adicional: '4000.00' },
+                            ],
+                            tipo: 'granizado',
                             cantidad: 1,
-                            precio: 16000,
-                            is_granizado: true,
-                            ingredientes: [
-                                { category: 'Base', name: 'Mora Azul' },
-                                { category: 'Bolas Explosivas', name: 'Cereza' }
-                            ]
-                        }
-                    ]
-                }
-            ]
+                            precio: '16000.00',
+                        },
+                    ],
+                },
+            ],
         });
         axios.post.mockResolvedValue({ data: { exito: true } });
     });
@@ -71,10 +75,10 @@ describe('HU-24: Frontend Armar Granizado', () => {
             </MemoryRouter>
         );
 
-        // Verify the main item is rendered
-        expect(screen.getByText(/Granizado con Licor \(Grande\)/i)).toBeInTheDocument();
-        
-        // Verify ingredients are rendered
+        // The cart item nombre is shown
+        expect(screen.getByText(/Granizado con alcohol/i)).toBeInTheDocument();
+
+        // Ingredients rendered via ing.nombre
         expect(screen.getByText('• Mora Azul')).toBeInTheDocument();
         expect(screen.getByText('• Cereza')).toBeInTheDocument();
     });
@@ -86,18 +90,15 @@ describe('HU-24: Frontend Armar Granizado', () => {
             </MemoryRouter>
         );
 
-        // Since it fetches data on mount, wait for the item to appear
-        const item = await screen.findByText(/Granizado con Licor \(Grande\)/i);
+        // Wait for fetched data to appear
+        const item = await screen.findByText(/Granizado con alcohol/i);
         expect(item).toBeInTheDocument();
 
-        // Check for the visual indicator (the drink icon)
-        // Since we open a modal to see products, wait! 
-        // Ah, OrdersAdminPage has the items hidden behind a "Ver Detalles" button in the table.
-        // Let's trigger the click to open the modal.
+        // Open the detail modal
         const detailButtons = await screen.findAllByText('visibility');
-        detailButtons[0].click(); // open the modal
+        detailButtons[0].click();
 
-        // Now check for the icon and ingredients inside the modal
+        // Icon and ingredients should appear in modal
         const drinkIcon = await screen.findByText('local_drink');
         expect(drinkIcon).toBeInTheDocument();
         expect(screen.getByText('• Mora Azul')).toBeInTheDocument();
