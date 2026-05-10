@@ -169,7 +169,7 @@ describe('InventoryAdminPage surtir inventario', () => {
 
     await screen.findByText('Ron Dorado');
 
-    fireEvent.click(screen.getByText('Surtir stock'));
+    fireEvent.click(screen.getByText('Surtir inventario'));
 
     expect(await screen.findByTestId('tabla-surtir')).toBeInTheDocument();
     expect(screen.getByText('Ron Dorado')).toBeInTheDocument();
@@ -183,7 +183,7 @@ describe('InventoryAdminPage surtir inventario', () => {
 
     await screen.findByText('Ron Dorado');
 
-    fireEvent.click(screen.getByText('Surtir stock'));
+    fireEvent.click(screen.getByText('Surtir inventario'));
 
     await screen.findByTestId('tabla-surtir');
 

@@ -349,6 +349,22 @@ const InventoryAdminPage = () => {
                             style={{
                                 width: 'auto',
                                 padding: '12px 24px',
+                                display: 'flex',
+                                gap: '8px',
+                                background: modo === "surtir" ? 'var(--primary-green)' : 'var(--surface-high)',
+                                color: modo === "surtir" ? '#000' : 'var(--primary-green)',
+                                border: '1px solid var(--primary-green)',
+                                boxShadow: modo === "surtir" ? '0 0 18px rgba(0,255,140,0.25)' : '0 0 15px rgba(0,255,140,0.1)',
+                            }}
+                            onClick={() => setModo(modo === "surtir" ? "productos" : "surtir")}
+                        >
+                            <Plus size={20} /> Surtir inventario
+                        </button>
+                        <button
+                            className="btn-primary"
+                            style={{
+                                width: 'auto',
+                                padding: '12px 24px',
                                 background: 'var(--surface-high)',
                                 color: 'var(--text-secondary)',
                                 border: '1px solid var(--border)',
@@ -422,39 +438,6 @@ const InventoryAdminPage = () => {
                             {stats.ofertas}
                         </div>
                     </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-                    <button
-                        type="button"
-                        onClick={() => setModo("productos")}
-                        style={{
-                            padding: '10px 18px',
-                            borderRadius: '999px',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            background: modo === "productos" ? 'var(--primary-green)' : 'var(--surface-low)',
-                            color: modo === "productos" ? '#000' : 'var(--text-primary)',
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                        }}
-                    >
-                        Gestionar productos
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setModo("surtir")}
-                        style={{
-                            padding: '10px 18px',
-                            borderRadius: '999px',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            background: modo === "surtir" ? 'var(--primary-green)' : 'var(--surface-low)',
-                            color: modo === "surtir" ? '#000' : 'var(--text-primary)',
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                        }}
-                    >
-                        Surtir stock
-                    </button>
                 </div>
 
                 {modo === "productos" && (
