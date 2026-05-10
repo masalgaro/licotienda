@@ -413,6 +413,9 @@ const OrdersAdminPage = () => {
                                     <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>
                                         {pedido.cliente || 'Invitado'}
                                     </p>
+                                    <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', margin: 0, opacity: 0.7 }}>
+                                        {pedido.metodo_pago === 'TRANSFERENCIA' ? 'Transferencia' : 'Efectivo'}
+                                    </p>
                                 </td>
                                 <td style={{ padding: '0 24px' }}>
                                     {renderProductosCell(pedido)}
@@ -445,7 +448,7 @@ const OrdersAdminPage = () => {
                                                 border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer',
                                             }}
                                         >
-                                            <span className="material-icons-round">open_in_new</span>
+                                            <span className="material-icons-round">visibility</span>
                                         </button>
                                     </div>
                                 </td>
