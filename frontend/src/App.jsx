@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 /* Importación Modular (Arquitectura por Features) */
 import StorePage from './features/catalogo/StorePage';
+import GranizadoBuilder from './features/catalogo/GranizadoBuilder';
 import CartPage from './features/ventas/CartPage';
 import Checkout from './features/usuarios/Checkout';
 import AdminLoginPage from './features/usuarios/AdminLoginPage';
@@ -17,6 +18,7 @@ function App() {
         <Router>
             <Routes>
                 <Route path="/" element={<StorePage />} />
+                <Route path="/armar-granizado" element={<GranizadoBuilder />} />
                 <Route path="/carrito" element={<CartPage />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/pago" element={<PaymentSupport />} />

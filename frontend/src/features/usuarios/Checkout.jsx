@@ -445,9 +445,20 @@ const Checkout = () => {
                  <p className="label-caps" style={{ marginBottom: '24px' }}>Resumen de Compra</p>
                  <div className="hide-scrollbar" style={{ maxHeight: '200px', overflowY: 'auto' }}>
                     {cart.map(item => (
-                        <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '0.9rem' }}>
-                        <span className="text-secondary">{item.nombre} <small style={{ opacity: 0.6 }}>x{item.quantity}</small></span>
-                        <span style={{ fontWeight: 600 }}>${new Intl.NumberFormat('es-CO').format(item.precio * item.quantity)}</span>
+                        <div key={item.id} style={{ marginBottom: '12px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
+                                <span className="text-secondary">{item.nombre} <small style={{ opacity: 0.6 }}>x{item.quantity}</small></span>
+                                <span style={{ fontWeight: 600 }}>${new Intl.NumberFormat('es-CO').format(item.precio * item.quantity)}</span>
+                            </div>
+                            {item.is_granizado && item.ingredientes && (
+                                <div style={{ marginTop: '4px', paddingLeft: '8px', borderLeft: '2px solid rgba(255,255,255,0.1)' }}>
+                                    {item.ingredientes.map((ing, idx) => (
+                                        <div key={idx} style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                            • {ing.name}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     ))}
                  </div>

@@ -115,26 +115,38 @@ const OrderDetailModal = ({ pedido, motivoRechazo, setMotivoRechazo, onClose, on
                             <div
                                 key={idx}
                                 style={{
-                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                    display: 'flex', flexDirection: 'column',
                                     padding: '10px 0',
                                     borderBottom: idx < items.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
                                 }}
                             >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                    <span style={{
-                                        background: 'var(--surface-high)', borderRadius: '8px',
-                                        padding: '4px 10px', fontSize: '0.75rem', fontWeight: 700,
-                                        color: 'var(--text-secondary)', minWidth: '28px', textAlign: 'center',
-                                    }}>
-                                        x{item.cantidad}
-                                    </span>
-                                    <span style={{ fontSize: '0.87rem', fontWeight: 500 }}>
-                                        {item.producto_nombre || `Producto #${item.producto}`}
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <span style={{
+                                            background: 'var(--surface-high)', borderRadius: '8px',
+                                            padding: '4px 10px', fontSize: '0.75rem', fontWeight: 700,
+                                            color: 'var(--text-secondary)', minWidth: '28px', textAlign: 'center',
+                                        }}>
+                                            x{item.cantidad}
+                                        </span>
+                                        <span style={{ fontSize: '0.87rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            {item.is_granizado && <span className="material-icons-round" style={{ color: 'var(--primary-green)', fontSize: '16px' }}>local_drink</span>}
+                                            {item.producto_nombre || `Producto #${item.producto}`}
+                                        </span>
+                                    </div>
+                                    <span style={{ fontSize: '0.87rem', fontWeight: 700, color: 'var(--text-primary)', flexShrink: 0 }}>
+                                        ${fmt(parseFloat(item.precio) * item.cantidad)}
                                     </span>
                                 </div>
-                                <span style={{ fontSize: '0.87rem', fontWeight: 700, color: 'var(--text-primary)', flexShrink: 0 }}>
-                                    ${fmt(parseFloat(item.precio) * item.cantidad)}
-                                </span>
+                                {item.is_granizado && item.ingredientes && (
+                                    <div style={{ marginTop: '8px', paddingLeft: '50px' }}>
+                                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                            {item.ingredientes.map((ing, i) => (
+                                                <li key={i}>• {ing.name}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -401,6 +413,9 @@ const OrdersAdminPage = () => {
                                     <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>
                                         {pedido.cliente || 'Invitado'}
                                     </p>
+                                    <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', margin: 0, opacity: 0.7 }}>
+                                        {pedido.metodo_pago === 'TRANSFERENCIA' ? 'Transferencia' : 'Efectivo'}
+                                    </p>
                                 </td>
                                 <td style={{ padding: '0 24px' }}>
                                     {renderProductosCell(pedido)}
@@ -433,7 +448,7 @@ const OrdersAdminPage = () => {
                                                 border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer',
                                             }}
                                         >
-                                            <span className="material-icons-round">open_in_new</span>
+                                            <span className="material-icons-round">visibility</span>
                                         </button>
                                     </div>
                                 </td>
