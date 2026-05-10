@@ -1,4 +1,6 @@
+import json
 import re
+from json import JSONDecodeError
 
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -10,6 +12,35 @@ from usuarios.infraestructura.models import Usuario, UsuarioDireccion
 
 from .models import Pedido
 from .serializers import PedidoSerializer
+
+
+def _normalizar_items_carrito(items):
+    items_normalizados = []
+
+    for item in items or []:
+        if not isinstance(item, dict):
+            items_normalizados.append(item)
+            continue
+
+        item_normalizado = item.copy()
+        producto_id = item_normalizado.get("producto")
+
+        if (
+            not item_normalizado.get("granizado")
+            and isinstance(producto_id, str)
+            and producto_id.startswith("granizado-")
+        ):
+            item_normalizado["granizado"] = producto_id.replace("granizado-", "", 1)
+            item_normalizado.pop("producto", None)
+
+        if item_normalizado.get("producto") in ("", None):
+            item_normalizado.pop("producto", None)
+        if item_normalizado.get("granizado") in ("", None):
+            item_normalizado.pop("granizado", None)
+
+        items_normalizados.append(item_normalizado)
+
+    return items_normalizados
 
 
 class CrearPedidoView(APIView):
@@ -29,15 +60,14 @@ class CrearPedidoView(APIView):
 
         items_json = data.get("items")
         # Si items viene como string (por FormData), parseamos JSON
-        import json
-
         if isinstance(items_json, str):
             try:
                 items_data = json.loads(items_json)
-            except:
+            except JSONDecodeError:
                 items_data = []
         else:
             items_data = items_json or []
+        items_data = _normalizar_items_carrito(items_data)
 
         telefono_raw = data.get("telefono")
         nombres = data.get("nombres", "")
@@ -100,25 +130,34 @@ class CrearPedidoView(APIView):
             from django.db import transaction
             from rest_framework.exceptions import ValidationError
 
+            from granizados.infraestructura.models import Granizado
             from inventario.infraestructura.models import ProductoModelo
 
             try:
                 with transaction.atomic():
                     for item_data in items_data:
                         producto_id = item_data.get("producto")
+                        granizado_id = item_data.get("granizado")
                         cantidad_req = int(item_data.get("cantidad", 1))
 
-                        producto = ProductoModelo.objects.select_for_update().get(id=producto_id)
+                        if producto_id:
+                            producto = ProductoModelo.objects.select_for_update().get(id=producto_id)
 
-                        if producto.existencias < cantidad_req:
+                            if producto.existencias < cantidad_req:
+                                raise ValidationError(
+                                    f"Lamentablemente, el producto '{producto.nombre}' ya no cuenta con el stock solicitado. Por favor, ajusta tu carrito."
+                                )
+
+                            # Decrementar
+                            producto.existencias -= cantidad_req
+
+                            producto.save()
+                        elif granizado_id:
+                            Granizado.objects.get(id=granizado_id)
+                        else:
                             raise ValidationError(
-                                f"Lamentablemente, el producto '{producto.nombre}' ya no cuenta con el stock solicitado. Por favor, ajusta tu carrito."
+                                "Cada item debe tener exactamente un producto o un granizado."
                             )
-
-                        # Decrementar
-                        producto.existencias -= cantidad_req
-
-                        producto.save()
 
                     # Si todo bien, guardamos el pedido
                     pedido = serializer.save()
@@ -154,20 +193,36 @@ class ValidarCarritoView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        from granizados.infraestructura.models import Granizado
         from inventario.infraestructura.models import ProductoModelo
 
-        items = request.data.get("items", [])
+        items = _normalizar_items_carrito(request.data.get("items", []))
 
         for item in items:
+            if not isinstance(item, dict):
+                return Response(
+                    {"error": "Formato de item inválido."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             prod_id = item.get("producto")
+            granizado_id = item.get("granizado")
             cantidad = int(item.get("cantidad", 1))
             try:
-                prod = ProductoModelo.objects.get(id=prod_id)
-                if prod.existencias < cantidad:
+                if prod_id:
+                    prod = ProductoModelo.objects.get(id=prod_id)
+                    if prod.existencias < cantidad:
+                        return Response(
+                            {
+                                "error": f"El producto '{prod.nombre}' se ha agotado o no tiene suficiente stock."
+                            },
+                            status=status.HTTP_400_BAD_REQUEST,
+                        )
+                elif granizado_id:
+                    Granizado.objects.get(id=granizado_id)
+                else:
                     return Response(
-                        {
-                            "error": f"El producto '{prod.nombre}' se ha agotado o no tiene suficiente stock."
-                        },
+                        {"error": "Cada item debe tener exactamente un producto o un granizado."},
                         status=status.HTTP_400_BAD_REQUEST,
                     )
             except ProductoModelo.DoesNotExist:
@@ -175,12 +230,13 @@ class ValidarCarritoView(APIView):
                     {"error": "Un producto de tu carrito ya no existe."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+            except Granizado.DoesNotExist:
+                return Response(
+                    {"error": "Un granizado de tu carrito ya no existe."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         return Response({"exito": True}, status=status.HTTP_200_OK)
-
-
-from rest_framework.permissions import AllowAny
-
 
 class ListarMisPedidosView(APIView):
     """
