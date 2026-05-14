@@ -14,10 +14,14 @@ const STATUS_LABEL = {
     PENDIENTE_PAGO: 'Pendiente',
     PREPARANDO: 'Preparando',
     DESPACHADO: 'Despachado',
+    ENTREGADO: 'Entregado',
 };
 
 const getStatusColor = status => {
     switch (status) {
+        case 'ENTREGADO': return 'var(--primary-green)';
+        case 'PREPARANDO': return '#fdbd2d';
+        case 'DESPACHADO': return '#4ea8de';
         case 'PAGO_VERIFICADO': return 'var(--primary-green)';
         case 'PAGO_SUBIDO': return '#fdbd2d';
         case 'PAGO_RECHAZADO': return 'var(--error)';
@@ -45,7 +49,7 @@ const SectionLabel = ({ children }) => (
 
 const Divider = () => <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', margin: '24px 0' }} />;
 
-const OrderDetailModal = ({ pedido, motivoRechazo, setMotivoRechazo, onClose, onAction }) => {
+const OrderDetailModal = ({ pedido, motivoRechazo, setMotivoRechazo, onClose, onAction, onEstado }) => {
     const items = pedido.items || [];
     const subtotal = items.reduce((s, i) => s + parseFloat(i.precio) * i.cantidad, 0);
     const envio = parseFloat(pedido.costo_envio || 0);
@@ -254,6 +258,32 @@ const OrderDetailModal = ({ pedido, motivoRechazo, setMotivoRechazo, onClose, on
                             </div>
                         </>
                     )}
+                    {/* Cambio de estado operativo */}
+                    {(() => {
+                      const SIGUIENTE_ESTADO = {
+                        PENDIENTE_PAGO:  { estado: 'PREPARANDO', label: 'Marcar en Preparación' },
+                        PAGO_SUBIDO:     { estado: 'PREPARANDO', label: 'Marcar en Preparación' },
+                        PAGO_VERIFICADO: { estado: 'PREPARANDO', label: 'Marcar en Preparación' },
+                        PREPARANDO:      { estado: pedido.domicilio ? 'DESPACHADO' : 'ENTREGADO', label: pedido.domicilio ? 'Marcar como Despachado' : 'Marcar como Entregado' },
+                        DESPACHADO:      { estado: 'ENTREGADO', label: 'Marcar como Entregado' },
+                      };
+                      const siguiente = SIGUIENTE_ESTADO[pedido.estado];
+                      if (!siguiente) return null;
+                      return (
+                        <>
+                          <Divider />
+                          <SectionLabel>Avanzar Estado</SectionLabel>
+                          <button
+                            className="btn-secondary"
+                            onClick={() => onEstado(pedido.id, siguiente.estado)}
+                            style={{ width: '100%' }}
+                          >
+                            <span className="material-icons-round" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '8px' }}>arrow_forward</span>
+                            {siguiente.label}
+                          </button>
+                        </>
+                      );
+                    })()}
                 </div>
             </motion.div>
         </motion.div>
@@ -350,6 +380,21 @@ const OrdersAdminPage = () => {
         );
     };
 
+    const handleCambiarEstado = async (pedidoId, estadoNuevo) => {
+      try {
+        const res = await axios.post('http://127.0.0.1:8000/api/v1/ventas/cambiar-estado/', {
+          pedido_id: pedidoId,
+          estado_nuevo: estadoNuevo,
+        });
+        if (res.data.exito) {
+          fetchOrders();
+          setDetailOrder(null);
+        }
+      } catch {
+        alert('Error al cambiar el estado del pedido');
+      }
+    };
+
     return (
         <div className="app-container animate-fade">
             <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
@@ -377,7 +422,7 @@ const OrdersAdminPage = () => {
 
             {/* Filters */}
             <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', overflowX: 'auto', paddingBottom: '8px' }} className="hide-scrollbar">
-                {['TODOS', 'PAGO_SUBIDO', 'PAGO_VERIFICADO', 'PAGO_RECHAZADO', 'DESPACHADO'].map(f => (
+                {['TODOS', 'PAGO_SUBIDO', 'PAGO_VERIFICADO', 'PAGO_RECHAZADO', 'DESPACHADO', 'ENTREGADO'].map(f => (
                     <button
                         key={f}
                         onClick={() => setFiltro(f)}
@@ -416,6 +461,17 @@ const OrdersAdminPage = () => {
                                     <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', margin: 0, opacity: 0.7 }}>
                                         {pedido.metodo_pago === 'TRANSFERENCIA' ? 'Transferencia' : 'Efectivo'}
                                     </p>
+                                    {pedido.domicilio ? (
+                                      <p style={{ fontSize: '0.65rem', margin: 0, color: '#4ea8de', fontWeight: 700 }}>
+                                        <span className="material-icons-round" style={{ fontSize: '10px', verticalAlign: 'middle' }}>delivery_dining</span>{' '}
+                                        Domicilio
+                                      </p>
+                                    ) : (
+                                      <p style={{ fontSize: '0.65rem', margin: 0, color: 'var(--text-secondary)', fontWeight: 700 }}>
+                                        <span className="material-icons-round" style={{ fontSize: '10px', verticalAlign: 'middle' }}>storefront</span>{' '}
+                                        En tienda
+                                      </p>
+                                    )}
                                 </td>
                                 <td style={{ padding: '0 24px' }}>
                                     {renderProductosCell(pedido)}
@@ -472,6 +528,7 @@ const OrdersAdminPage = () => {
                         setMotivoRechazo={setMotivoRechazo}
                         onClose={() => { setDetailOrder(null); setMotivoRechazo(''); }}
                         onAction={handleAction}
+                        onEstado={handleCambiarEstado}
                     />
                 )}
             </AnimatePresence>

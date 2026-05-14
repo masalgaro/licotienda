@@ -16,6 +16,7 @@ const Checkout = () => {
   const [telefono, setTelefono] = useState('');
   const [nombres, setNombres] = useState('');
   const [apellidos, setApellidos] = useState('');
+  const [esDomicilio, setEsDomicilio] = useState(true);
   const [direccion, setDireccion] = useState('');
   const [observaciones, setObservaciones] = useState('');
   const [metodoPago, setMetodoPago] = useState('efectivo');
@@ -29,6 +30,11 @@ const Checkout = () => {
   const [buscando, setBuscando] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [showQR, setShowQR] = useState(false);
+
+  // Seguimiento
+  const [telSeguimiento, setTelSeguimiento] = useState('');
+  const [pedidosSeguimiento, setPedidosSeguimiento] = useState(null);
+  const [buscandoPedido, setBuscandoPedido] = useState(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -72,7 +78,8 @@ const Checkout = () => {
 
   // Acción: Finalizar Pedido
   const handleConfirmOrder = async () => {
-    if (!direccion || !nombres || !apellidos) return;
+    if (esDomicilio && (!direccion || !nombres || !apellidos)) return;
+    if (!esDomicilio && (!nombres || !apellidos)) return;
     if (metodoPago === 'transferencia' && !comprobante) {
       alert("Por favor adjunta el comprobante de pago");
       return;
@@ -81,6 +88,7 @@ const Checkout = () => {
     setEnviando(true);
     try {
       const formData = new FormData();
+      formData.append('domicilio', esDomicilio);
       formData.append('telefono', telefono);
       formData.append('nombres', nombres);
       formData.append('apellidos', apellidos);
@@ -88,12 +96,12 @@ const Checkout = () => {
       formData.append('notas', observaciones);
       formData.append('metodo_pago', metodoPago);
       formData.append('recordar_direccion', recordarDireccion);
+      formData.append('costo_envio', esDomicilio ? 6000 : 0);
       formData.append('items', JSON.stringify(cart.map(item => ({
         producto: item.id,
         cantidad: item.quantity,
         precio: item.precio
       }))));
-      formData.append('costo_envio', 6000);
       
       if (comprobante) {
         formData.append('comprobante', comprobante);
@@ -129,8 +137,64 @@ const Checkout = () => {
     }
   };
 
-  const envioCost = 6000;
+  // Rastreo del producto
+  const handleBuscarPedido = async () => {
+    const telLimpio = telSeguimiento.replace(/\D/g, '');
+    if (telLimpio.length < 10) return;
+    setBuscandoPedido(true);
+    try {
+      const res = await axios.get(`http://127.0.0.1:8000/api/v1/ventas/seguimiento/?telefono=${telLimpio}`);
+      setPedidosSeguimiento(res.data);
+    } catch {
+      setPedidosSeguimiento([]);
+    } finally {
+      setBuscandoPedido(false);
+    }
+  };
+
+  const ESTADO_INFO = {
+    PENDIENTE_PAGO:  { label: 'Pendiente de Pago', icon: 'schedule',         color: 'var(--text-secondary)' },
+    PAGO_SUBIDO:     { label: 'Pago Subido',        icon: 'upload',           color: '#fdbd2d' },
+    PAGO_VERIFICADO: { label: 'Pago Verificado',    icon: 'verified',         color: 'var(--primary-green)' },
+    PAGO_RECHAZADO:  { label: 'Pago Rechazado',     icon: 'cancel',           color: 'var(--error, #ff4d4d)' },
+    PREPARANDO:      { label: 'Preparando',          icon: 'restaurant',       color: '#fdbd2d' },
+    DESPACHADO:      { label: 'Despachado',          icon: 'local_shipping',   color: 'var(--primary-green)' },
+    ENTREGADO:       { label: 'Entregado',           icon: 'check_circle',     color: 'var(--primary-green)' },
+  };
+
+  const envioCost = esDomicilio ? 6000 : 0;
   const finalTotal = total + envioCost;
+
+  // Toggle de tipo de pedido 
+  const TipoPedidoToggle = () => (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '8px' }}>
+      {[
+        { valor: true,  icono: 'delivery_dining', label: 'Domicilio' },
+        { valor: false, icono: 'storefront',      label: 'Recoger en Tienda' },
+      ].map(({ valor, icono, label }) => (
+        <motion.div
+          key={String(valor)}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => {
+            setEsDomicilio(valor);
+            setTelefono('');
+            setNombres('');
+            setApellidos('');
+            setDireccion('');
+          }}
+          style={{
+            border: `1px solid ${esDomicilio === valor ? 'var(--primary-green)' : 'rgba(255,255,255,0.05)'}`,
+            background: esDomicilio === valor ? 'rgba(57, 181, 74, 0.08)' : 'var(--surface-low)',
+            padding: '20px 16px', borderRadius: '16px', textAlign: 'center',
+            cursor: 'pointer', transition: 'var(--transition)',
+          }}
+        >
+          <span className="material-icons-round" style={{ fontSize: '28px', color: esDomicilio === valor ? 'var(--primary-green)' : 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>{icono}</span>
+          <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{label}</span>
+        </motion.div>
+      ))}
+    </div>
+  );
 
   return (
     <div className="app-container animate-fade">
@@ -170,6 +234,59 @@ const Checkout = () => {
                         Volver al Inicio
                     </button>
                 </div>
+
+                {/* SEGUIMIENTO */}
+                {esDomicilio && (
+                    <div className="glass-card" style={{ padding: '32px' }}>
+                        <p className="label-caps" style={{ marginBottom: '8px' }}>Seguimiento de Pedido</p>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '20px' }}>
+                            Consulta el estado de tus pedidos en cualquier momento ingresando tu número.
+                        </p>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <input
+                                type="tel"
+                                className="premium-input"
+                                style={{ flex: 1 }}
+                                placeholder="300 000 0000"
+                                value={telSeguimiento}
+                                onChange={(e) => setTelSeguimiento(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleBuscarPedido()}
+                            />
+                            <button
+                                className="btn-primary"
+                                style={{ width: 'auto', padding: '0 24px' }}
+                                disabled={telSeguimiento.replace(/\D/g, '').length < 10 || buscandoPedido}
+                                onClick={handleBuscarPedido}
+                            >
+                                {buscandoPedido ? '...' : 'Buscar'}
+                            </button>
+                        </div>
+
+                        {pedidosSeguimiento !== null && (
+                            <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                {pedidosSeguimiento.length === 0 ? (
+                                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>No encontramos pedidos para ese número.</p>
+                                ) : pedidosSeguimiento.map(p => {
+                                    const info = ESTADO_INFO[p.estado] || { label: p.estado, icon: 'help', color: 'var(--text-secondary)' };
+                                    return (
+                                        <div key={p.id} style={{ background: 'var(--surface-high)', borderRadius: '16px', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div>
+                                                <p style={{ fontWeight: 800, margin: '0 0 4px' }}>Pedido #{p.id}</p>
+                                                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>
+                                                    {new Date(p.creado_en).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                                </p>
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: info.color }}>
+                                                <span className="material-icons-round" style={{ fontSize: '20px' }}>{info.icon}</span>
+                                                <span style={{ fontWeight: 700, fontSize: '0.8rem' }}>{info.label}</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* INFO DE LA LICO INTEGRADA */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -230,22 +347,37 @@ const Checkout = () => {
                   exit={{ x: 20, opacity: 0 }}
                 >
                   <section className="glass-card" style={{ padding: '32px' }}>
-                    <p className="label-caps" style={{ marginBottom: '24px' }}>Paso 1: Identificación</p>
-                    <div style={{ marginBottom: '24px' }}>
-                      <label style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '8px' }}>NÚMERO DE TELÉFONO</label>
-                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px', opacity: 0.6 }}>Usamos tu número para reconocer tus pedidos anteriores y darte un servicio más rápido.</p>
-                      <input 
-                        type="tel" 
-                        className="premium-input"
-                        autoFocus
-                        autoComplete="off"
-                        style={{ fontSize: '1.4rem', fontWeight: 800, padding: '24px', textAlign: 'center', letterSpacing: '2px' }}
-                        value={telefono} 
-                        onChange={(e) => setTelefono(e.target.value)}
-                        placeholder="300 000 0000"
-                        onKeyDown={(e) => e.key === 'Enter' && handleNextStep()}
-                      />
+                    {/* Toggle del tipo de pedido */}
+                    <div>
+                      <p className="label-caps" style={{ marginBottom: '16px' }}>Tipo de Pedido</p>
+                      <TipoPedidoToggle />
                     </div>
+                    {/* Solo pedir teléfono para domicilios */}
+                    {esDomicilio && (
+                      <div style={{ marginBottom: '24px' }}>
+                        <p className="label-caps" style={{ marginBottom: '24px' }}>Paso 1: Identificación</p>
+                        <label style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '8px' }}>NÚMERO DE TELÉFONO</label>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px', opacity: 0.6 }}>Usamos tu número para reconocer tus pedidos anteriores y darte un servicio más rápido.</p>
+                        <input 
+                          type="tel" 
+                          className="premium-input"
+                          autoFocus
+                          autoComplete="off"
+                          style={{ fontSize: '1.4rem', fontWeight: 800, padding: '24px', textAlign: 'center', letterSpacing: '2px' }}
+                          value={telefono} 
+                          onChange={(e) => setTelefono(e.target.value)}
+                          placeholder="300 000 0000"
+                          onKeyDown={(e) => e.key === 'Enter' && handleNextStep()}
+                        />
+                      </div>
+                    )}
+
+                    {!esDomicilio && (
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', opacity: 0.7 }}>
+                        Para pedidos en tienda no necesitamos tu número. Completa tus datos en el siguiente paso.
+                      </p>
+                    )}
+
                     <button 
                       className="btn-primary" 
                       disabled={telefono.replace(/\D/g, '').length < 10 || buscando}
@@ -289,48 +421,60 @@ const Checkout = () => {
                         />
                       </div>
                     </div>
-    
-                    <div style={{ marginBottom: '20px' }}>
-                      <label className="label-caps" style={{ fontSize: '0.65rem' }}>Dirección de Entrega</label>
-                      {direccionesDisponibles.length > 0 && (
-                        <div className="hide-scrollbar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', marginBottom: '12px' }}>
-                          {direccionesDisponibles.map((dep, i) => (
-                            <button 
-                              key={i}
-                              onClick={() => setDireccion(dep)}
-                              style={{
-                                padding: '8px 16px', borderRadius: '24px', fontSize: '0.75rem', fontWeight: 600,
-                                background: direccion === dep ? 'var(--primary-green)' : 'var(--surface-high)',
-                                color: direccion === dep ? 'black' : 'var(--text-secondary)',
-                                border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', transition: '0.2s'
-                              }}
-                            >
-                              {dep.split(',')[0]}
-                            </button>
-                          ))}
+                    { /* Solo pedir dirección para domicilios */ } 
+                    {esDomicilio && (
+                      <div style={{ marginBottom: '20px' }}>
+                        <label className="label-caps" style={{ fontSize: '0.65rem' }}>Dirección de Entrega</label>
+                        {direccionesDisponibles.length > 0 && (
+                          <div className="hide-scrollbar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', marginBottom: '12px' }}>
+                            {direccionesDisponibles.map((dep, i) => (
+                              <button 
+                                key={i}
+                                onClick={() => setDireccion(dep)}
+                                style={{
+                                  padding: '8px 16px', borderRadius: '24px', fontSize: '0.75rem', fontWeight: 600,
+                                  background: direccion === dep ? 'var(--primary-green)' : 'var(--surface-high)',
+                                  color: direccion === dep ? 'black' : 'var(--text-secondary)',
+                                  border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', transition: '0.2s'
+                                }}
+                              >
+                                {dep.split(',')[0]}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        <input 
+                          type="text" 
+                          className="premium-input" 
+                          value={direccion} 
+                          onChange={(e) => setDireccion(e.target.value)}
+                          placeholder="Calle, Carrera, Barrio..."
+                        />
+                        
+                        {esUsuarioNuevo && (
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '12px', cursor: 'pointer' }}>
+                            <input 
+                              type="checkbox" 
+                              checked={recordarDireccion} 
+                              onChange={(e) => setRecordarDireccion(e.target.checked)}
+                              style={{ width: '18px', height: '18px', accentColor: 'var(--primary-green)' }}
+                            />
+                            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Recordar esta dirección para mi próxima compra</span>
+                          </label>
+                        )}
+                      </div>
+                    )}
+
+                    {!esDomicilio && (
+                      <div style={{ background: 'rgba(57, 181, 74, 0.05)', border: '1px dashed rgba(57, 181, 74, 0.2)', borderRadius: '12px', padding: '16px', marginBottom: '20px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <span className="material-icons-round" style={{ color: 'var(--primary-green)' }}>storefront</span>
+                        <div>
+                          <p style={{ margin: 0, fontWeight: 700, fontSize: '0.85rem' }}>Retiro en Cra 68 #61-88, Calatrava, Itagüí</p>
+                          <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Viernes-Sábados: 6PM–2AM · Domingos: 4PM–10PM</p>
                         </div>
-                      )}
-                      <input 
-                        type="text" 
-                        className="premium-input" 
-                        value={direccion} 
-                        onChange={(e) => setDireccion(e.target.value)}
-                        placeholder="Calle, Carrera, Barrio..."
-                      />
-                      
-                      {esUsuarioNuevo && (
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '12px', cursor: 'pointer' }}>
-                          <input 
-                            type="checkbox" 
-                            checked={recordarDireccion} 
-                            onChange={(e) => setRecordarDireccion(e.target.checked)}
-                            style={{ width: '18px', height: '18px', accentColor: 'var(--primary-green)' }}
-                          />
-                          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Recordar esta dirección para mi próxima compra</span>
-                        </label>
-                      )}
-                    </div>
-    
+                      </div>
+                    )}
+
                     <div>
                       <label className="label-caps" style={{ fontSize: '0.65rem' }}>Observaciones (Opcional)</label>
                       <textarea 
@@ -338,11 +482,11 @@ const Checkout = () => {
                         style={{ height: '80px', paddingTop: '12px', resize: 'none' }}
                         value={observaciones}
                         onChange={(e) => setObservaciones(e.target.value)}
-                        placeholder="Instrucciones adicionales, código de apto, etc."
+                        placeholder="Instrucciones adicionales."
                       />
                     </div>
                   </section>
-    
+                  {/* Método de Pago */} 
                   <section className="glass-card" style={{ padding: '28px' }}>
                     <p className="label-caps" style={{ marginBottom: '20px' }}>Método de Pago</p>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
@@ -462,10 +606,14 @@ const Checkout = () => {
                         </div>
                     ))}
                  </div>
+
+                 {esDomicilio&&(
                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '16px' }}>
                     <span>Domicilio (Itagüí)</span>
                     <span>$6.000</span>
                  </div>
+                 )}
+
                  <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '20px 0' }}></div>
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span className="headline-md" style={{ margin: 0, fontSize: '1.1rem' }}>Total</span>
@@ -478,7 +626,8 @@ const Checkout = () => {
                   onClick={() => step === 1 ? handleNextStep() : handleConfirmOrder()}
                   className="btn-primary" 
                   style={{ marginTop: '28px', height: '60px', fontSize: '1.1rem', width: '100%' }}
-                  disabled={(step === 1 && (telefono.replace(/\D/g, '').length < 10 || buscando)) || (step === 2 && (!direccion || !nombres || !apellidos || enviando || (metodoPago === 'transferencia' && !comprobante)))}
+                  disabled={(step === 1 && esDomicilio && (telefono.replace(/\D/g, '').length < 10 || buscando)) ||
+                    (step === 2 && ((!direccion && esDomicilio) || !nombres || !apellidos || enviando || (metodoPago === 'transferencia' && !comprobante)))}
                 >
                   {step === 1 ? (buscando ? 'Buscando...' : 'Siguiente') : (enviando ? 'Procesando...' : (metodoPago === 'transferencia' ? 'Enviar Comprobante & Pedido' : 'Confirmar Pedido'))}
                 </button>
