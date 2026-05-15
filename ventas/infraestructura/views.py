@@ -2,8 +2,7 @@ import json
 import re
 from json import JSONDecodeError
 
-from django.utils.crypto import get_random_string # Para recoger en tienda sin telefono
-
+from django.utils.crypto import get_random_string
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -81,7 +80,7 @@ class CrearPedidoView(APIView):
         metodo_pago = data.get("metodo_pago", "EFECTIVO").upper()
         es_domicilio = data.get("domicilio", "true") not in ("fales", False)
 
-        if not items_data or (es_domicilio and not telefono_raw):
+        if not items_data or (es_domicilio and not (telefono_raw or direccion)):
             return Response({"error": "Datos Incompletos"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not telefono_raw: # Usuario temporal

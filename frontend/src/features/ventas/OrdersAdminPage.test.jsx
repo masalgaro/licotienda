@@ -296,4 +296,82 @@ describe('OrdersAdminPage', () => {
       expect(screen.getByText('Efectivo')).toBeInTheDocument();
     });
   });
+
+  describe('Nuevas funcionalidades: domicilio y cambio de estado', () => {
+    const mockOrdersConDomicilio = [
+      {
+          id: 10,
+          cliente: 'Ana Torres',
+          domicilio: true,   // ← pedido a domicilio
+          items: [{ producto_nombre: 'Ron Medellín', cantidad: 1, precio: '38000', tipo: 'producto' }],
+          costo_envio: 6000,
+          final_total: 44000,
+          estado: 'PREPARANDO',
+          metodo_pago: 'EFECTIVO',
+          soporte_pago_url: null,
+          notas: '',
+          direccion: 'Calle 80 #10-15',
+      },
+      {
+          id: 11,
+          cliente: 'Luis Vera',
+          domicilio: false,  // ← pedido en tienda
+          items: [{ producto_nombre: 'Whisky 12 años', cantidad: 1, precio: '95000', tipo: 'producto' }],
+          costo_envio: 0,
+          final_total: 95000,
+          estado: 'PREPARANDO',
+          metodo_pago: 'EFECTIVO',
+          soporte_pago_url: null,
+          notas: '',
+          direccion: '',
+      },
+    ];
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+      axios.get.mockResolvedValue({ data: mockOrdersConDomicilio });
+      axios.post.mockResolvedValue({ data: { exito: true, estado_nuevo: 'DESPACHADO' } });
+    });
+
+    it('muestra el distintivo de domicilio para pedidos a domicilio', async () => {
+      render(
+        <BrowserRouter>
+          <OrdersAdminPage />
+        </BrowserRouter>
+      );
+
+      // Esperar a que carguen los pedidos
+      await screen.findByText('Ana Torres');
+
+      // El pedido a domicilio debe mostrar su distintivo
+      expect(screen.getByText('Domicilio')).toBeInTheDocument();
+    });
+
+    it('muestra el distintivo de en tienda para pedidos sin domicilio', async () => {
+      render(
+        <BrowserRouter>
+          <OrdersAdminPage />
+        </BrowserRouter>
+      );
+
+      await screen.findByText('Luis Vera');
+
+      // El pedido en tienda debe mostrar su propio distintivo
+      expect(screen.getByText('En tienda')).toBeInTheDocument();
+    });
+
+    it('no muestra el distintivo de domicilio en pedidos en tienda', async () => {
+      // Solo pedido en tienda
+      axios.get.mockResolvedValue({ data: [mockOrdersConDomicilio[1]] });
+
+      render(
+        <BrowserRouter>
+          <OrdersAdminPage />
+        </BrowserRouter>
+      );
+
+      await screen.findByText('Luis Vera');
+      expect(screen.queryByText('Domicilio')).not.toBeInTheDocument();
+    });
+  });
 });
