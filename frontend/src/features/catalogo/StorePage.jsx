@@ -139,9 +139,15 @@ const StorePage = () => {
                 }}>
                     <span className="material-icons-round" style={{ fontSize: '20px' }}>shopping_cart</span> CARRITO
                 </Link>
-                <a href="#info" onClick={scrollToInfo} style={{ 
-                    display: 'flex', alignItems: 'center', gap: '8px', 
-                    textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: 600, fontSize: '0.85rem' 
+                <Link to="/rastreo" style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: 600, fontSize: '0.85rem'
+                }}>
+                    <span className="material-icons-round" style={{ fontSize: '20px' }}>location_searching</span> RASTREO
+                </Link>
+                <a href="#info" onClick={scrollToInfo} style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: 600, fontSize: '0.85rem'
                 }}>
                     <span className="material-icons-round" style={{ fontSize: '20px' }}>info</span> INFO
                 </a>
@@ -366,6 +372,10 @@ const StorePage = () => {
                         Carrito
                         {itemCount > 0 && <span style={{ position: 'absolute', top: '-18px', right: '-12px', background: 'var(--primary-green)', color: 'black', fontSize: '10px', fontWeight: 900, padding: '2px 6px', borderRadius: '10px', minWidth: '18px', textAlign: 'center', border: '2px solid black' }}>{itemCount}</span>}
                     </span>
+                </Link>
+                <Link to="/rastreo" className="nav-item">
+                    <span className="material-icons-round">location_searching</span>
+                    <span>Rastreo</span>
                 </Link>
                 <a href="#info" onClick={scrollToInfo} className="nav-item">
                     <span className="material-icons-round">info</span>

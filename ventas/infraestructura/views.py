@@ -2,6 +2,7 @@ import json
 import re
 from json import JSONDecodeError
 
+from django.utils.crypto import get_random_string
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -77,9 +78,18 @@ class CrearPedidoView(APIView):
             data.get("recordar_direccion") == "true" or data.get("recordar_direccion") is True
         )
         metodo_pago = data.get("metodo_pago", "EFECTIVO").upper()
+        es_domicilio = data.get("domicilio", "true") not in ("false", False)
 
-        if not items_data or not telefono_raw:
-            return Response({"error": "Datos incompletos"}, status=status.HTTP_400_BAD_REQUEST)
+        if not items_data or (es_domicilio and not (telefono_raw and direccion)):
+            return Response({"error": "Datos Incompletos"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not telefono_raw: # Usuario temporal
+            usuario = Usuario.objects.create_user(
+                username=f"tienda_{get_random_string(8)}",
+                telefono="",
+                first_name=nombres,
+                last_name=apellidos,
+            )
 
         if metodo_pago == "TRANSFERENCIA" and not comprobante:
             return Response(
@@ -114,14 +124,22 @@ class CrearPedidoView(APIView):
             usuario.save()
 
         # 3. Serializar y Guardar Pedido
+        if not es_domicilio:
+            estado_inicial = "PREPARANDO"
+        elif metodo_pago == "TRANSFERENCIA":
+            estado_inicial = "PAGO_SUBIDO"
+        else:
+            estado_inicial = "PENDIENTE_PAGO"
+
         pedido_data = {
             "cliente": usuario.id,
             "items": items_data,
-            "estado": "PAGO_SUBIDO" if metodo_pago == "TRANSFERENCIA" else "PENDIENTE_PAGO",
+            "estado": estado_inicial,
             "metodo_pago": metodo_pago,
+            "domicilio": es_domicilio,
             "direccion": direccion,
             "notas": request.data.get("notas", ""),
-            "costo_envio": request.data.get("costo_envio", 6000),
+            "costo_envio": request.data.get("costo_envio", 6000) if es_domicilio else 0,
         }
 
         serializer = PedidoSerializer(data=pedido_data)
@@ -250,6 +268,26 @@ class ListarMisPedidosView(APIView):
         serializer = PedidoSerializer(pedidos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class BuscarPedidosPorTelefonoView(APIView):
+    """
+    Seguimiento público de pedidos por teléfono
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        telefono = re.sub(r"\D", "", request.query_params.get("telefono", ""))
+
+        if len(telefono) < 10:
+            return Response({"error": "Teléfono inválido"}, status=status.HTTP_400_BAD_REQUEST)
+        usuario = Usuario.objects.filter(telefono__icontains=telefono).first()
+
+        if not usuario:
+            return Response([], status=status.HTTP_200_OK)
+        pedidos = Pedido.objects.filter(cliente=usuario).order_by("-creado_en")[:10]
+        serializer = PedidoSerializer(pedidos, many=True)
+
+        return Response(serializer.data)
 
 class ListarTodosPedidosView(APIView):
     """
@@ -293,6 +331,45 @@ class GestionarPagoPedidoView(APIView):
                     soporte.save()
 
             pedido.save()
+            return Response({"exito": True, "estado_nuevo": pedido.estado})
+        except Pedido.DoesNotExist:
+            return Response({"error": "Pedido no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+class CambiarEstadoPedidoView(APIView):
+    """
+    Módulo Administrativo: Cambiar el estado de un pedido.
+    """
+
+    permission_classes = [AllowAny] # Temporal
+
+    TRANSICIONES_VALIDAS = {
+        "PENDIENTE_PAGO": ["PREPARANDO"],
+        "PAGO_SUBIDO": ["PREPARANDO"],
+        "PAGO_VERIFICADO": ["PREPARANDO"],
+        "PAGO_RECHAZADO": [],
+        "PREPARANDO": ["DESPACHADO", "ENTREGADO"],
+        "DESPACHADO": ["ENTREGADO"],
+        "ENTREGADO": []
+    }
+
+    def post(self, request):
+        pedido_id = request.data.get("pedido_id")
+        estado_nuevo = request.data.get("estado_nuevo")
+
+        if not pedido_id or not estado_nuevo:
+            return Response({"error": "Datos incompletos"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            pedido = Pedido.objects.get(id=pedido_id)
+            estado_actual = pedido.estado
+            transiciones = self.TRANSICIONES_VALIDAS.get(estado_actual, [])
+
+            if estado_nuevo not in transiciones:
+                return Response({"error": f"Transición no permitida: {estado_actual} -> {estado_nuevo}"}, status=status.HTTP_400_BAD_REQUEST)
+
+            pedido.estado = estado_nuevo
+            pedido.save()
+
             return Response({"exito": True, "estado_nuevo": pedido.estado})
         except Pedido.DoesNotExist:
             return Response({"error": "Pedido no encontrado"}, status=status.HTTP_404_NOT_FOUND)

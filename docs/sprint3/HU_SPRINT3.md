@@ -7,7 +7,7 @@
 | HU-24 | Autenticación JWT para el panel de administrador     | Kevin       | ✅ Completada |
 | HU-25 | Proteger rutas admin con redirección a login         | Kevin       | ✅ Completada |
 | HU-26 | Ocultar acceso admin de la navegación del cliente    | Kevin       | ✅ Completada |
-
+| HU-14 | Marcar pedidos a domicilio o para recoger en tienda  | Miguel      |  En revisión  |
 ---
 
 ## HU-24 — Autenticación JWT para el panel de administrador
@@ -104,3 +104,41 @@ Como cliente, no quiero ver ningún enlace de "Admin" en la navegación de la ti
 - `frontend/src/features/soporte/Contact.jsx`
 
 **Estado:** ✅ Completada
+
+---
+
+## HU-14 — Marcar pedidos como domicilio o para recoger en tienda 
+
+**Responsable:** Miguel
+
+**Descripción:**
+Como cliente quiero pedir productos a domicilio para hacer una compra más cómoda, desde la comodidad de mi casa, por si no me es posible ir a la tienda física.
+
+**Tareas cumplidas:**
+- Se agregó el estado "ENTREGADO" para los pedidos, referenciado tanto en `ventas/infrastructura/models.py` y `ventas/infrastructura/views.py`.
+- Se agregó un campo para validar si un pedido es a domicilio o no, visto en `ventas/infrastructura/serializers.py`, `ventas/infrastructura/views.py` y `ventas/infrastructura/models.py`.
+- Se configuró un endpoint para que un admin pueda cambiar el estado de los pedidos, siguiendo una mátriz de transición, visto en `ventas/infrastructura/views.py`.
+- Se agregó un toggle en la vista `frontend/src/features/usuarios/Checkout.jsx` para escoger entre un pedido que se recoge en tienda y un pedido a domicilio. El toggle, además, oculta los campos de dirección cuando se quiere recoger en tienda.
+- Se agregó un icono distintivo para los pedidos a domicilio en el panel de admin, visto en `frontend/src/features/ventas/OrdersAdminPage.jsx`.
+- Se agregó un endpoint nuevo a `ventas/infrastructura/views.py` para hacer el seguimiento del pedido, y se conecta con el frontend en `frontend/src/features/usuarios/Checkout.jsx` para mostrar el estado actual.
+- Se implementarón pruebas automáticas en `ventas/tests.py` para las nuevas funcionalidades.
+- Se implementarón pruebas automáticas en `frontend/src/features/usuarios/Checkout.test.jsx` y `frontend/src/features/ventas/OrdersAdminPage.test.jsx` para las nuevas funcionalidades.
+
+**Criterios de aceptación:**
+- Se debe cumplir que marcar entre un pedido a domicilio a uno corriente sea claro y sencillo para el usuario, y lo mismo en el orden contrario.
+- Se debe cumplir que un pedido a domicilio aparezca de forma especial al administrador del sitio.
+- Notificar al usuario cuando su pedido cambie al estado de despachado.
+- `python -m ruff check .` en la raíz del proyecto, y `npm run lint` y `npm run build` en el directorio `frontend` pasan sin errores.
+
+**Archivos modificados:**
+- `ventas/urls.py`
+- `ventas/infrastructura/models.py`
+- `ventas/infrastructura/views.py`
+- `ventas/infrastructura/serializers.py`
+- `ventas/tests.py`
+- `frontend/src/features/usuarios/Checkout.jsx`
+- `frontend/src/features/ventas/OrdersAdminPage.jsx`
+- `frontend/src/features/ventas/OrdersAdminPage.test.jsx`
+- `frontend/src/features/usuarios/Checkout.test.jsx` <- **Archivo nuevo**
+
+**Estado:** En revisión

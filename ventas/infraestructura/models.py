@@ -13,6 +13,7 @@ class Pedido(models.Model):
         ("PAGO_RECHAZADO", "Pago Rechazado"),
         ("PREPARANDO", "Preparando"),
         ("DESPACHADO", "Despachado"),
+        ("ENTREGADO", "Entregado"),
     ]
 
     METODOS_PAGO = [
@@ -25,8 +26,9 @@ class Pedido(models.Model):
     )
     estado = models.CharField(max_length=20, choices=ESTADOS, default="PENDIENTE_PAGO")
     metodo_pago = models.CharField(max_length=20, choices=METODOS_PAGO, default="EFECTIVO")
+    domicilio = models.BooleanField(null=False, default=True)
     costo_envio = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    direccion = models.TextField()
+    direccion = models.TextField(blank=True, default="")
     notas = models.TextField(blank=True)
     creado_en = models.DateTimeField(auto_now_add=True)
     actualizado_en = models.DateTimeField(auto_now=True)

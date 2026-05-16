@@ -176,7 +176,7 @@ const CartPage = () => {
                             </div>
 
                             <button onClick={handleProceedToCheckout} disabled={validando} className="btn-primary" style={{ width: '100%', textDecoration: 'none', textAlign: 'center', marginTop: '24px', fontSize: '1.05rem', border: 'none', cursor: validando ? 'not-allowed' : 'pointer', opacity: validando ? 0.7 : 1 }}>
-                                {validando ? 'Verificando stock...' : 'Proceder al Checkout'}
+                                {validando ? 'Verificando stock...' : 'Finalizar Pedido'}
                             </button>
                         </div>
                     </div>

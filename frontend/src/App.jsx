@@ -11,6 +11,7 @@ import PaymentSupport from './features/soporte/PaymentSupport';
 import Contact from './features/soporte/Contact';
 import InventoryAdminPage from './features/inventario/InventoryAdminPage';
 import OrdersAdminPage from './features/ventas/OrdersAdminPage';
+import RastreoPedidos from './features/ventas/RastreoPedidos';
 import GranizadosAdminPage from './features/catalogo/GranizadosAdminPage';
 import PrivateRoute from './shared/PrivateRoute';
 
@@ -22,6 +23,7 @@ function App() {
                 <Route path="/armar-granizado" element={<GranizadoBuilder />} />
                 <Route path="/carrito" element={<CartPage />} />
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/rastreo" element={<RastreoPedidos />} />
                 <Route path="/pago" element={<PaymentSupport />} />
                 <Route path="/contacto" element={<Contact />} />
                 <Route path="/admin/login" element={<AdminLoginPage />} />

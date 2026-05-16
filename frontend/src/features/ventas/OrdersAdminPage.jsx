@@ -14,10 +14,14 @@ const STATUS_LABEL = {
     PENDIENTE_PAGO: 'Pendiente',
     PREPARANDO: 'Preparando',
     DESPACHADO: 'Despachado',
+    ENTREGADO: 'Entregado',
 };
 
 const getStatusColor = status => {
     switch (status) {
+        case 'ENTREGADO': return 'var(--primary-green)';
+        case 'PREPARANDO': return '#fdbd2d';
+        case 'DESPACHADO': return '#4ea8de';
         case 'PAGO_VERIFICADO': return 'var(--primary-green)';
         case 'PAGO_SUBIDO': return '#fdbd2d';
         case 'PAGO_RECHAZADO': return 'var(--error)';
@@ -45,7 +49,7 @@ const SectionLabel = ({ children }) => (
 
 const Divider = () => <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', margin: '24px 0' }} />;
 
-const OrderDetailModal = ({ pedido, motivoRechazo, setMotivoRechazo, onClose, onAction }) => {
+const OrderDetailModal = ({ pedido, motivoRechazo, setMotivoRechazo, onClose, onAction, onEstado }) => {
     const items = pedido.items || [];
     const subtotal = items.reduce((s, i) => s + parseFloat(i.precio) * i.cantidad, 0);
     const envio = parseFloat(pedido.costo_envio || 0);
@@ -225,35 +229,110 @@ const OrderDetailModal = ({ pedido, motivoRechazo, setMotivoRechazo, onClose, on
                         </>
                     )}
 
-                    {/* Gestión de pago */}
+                    {/* Gestión de pago — solo para transferencias con pago subido */}
                     {puedeGestionar && (
                         <>
                             <Divider />
                             <SectionLabel>Gestionar Pago</SectionLabel>
-                            <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                            <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
                                 Motivo de rechazo (si aplica)
                             </label>
                             <textarea
                                 className="premium-input"
-                                style={{ height: '72px', marginTop: '8px' }}
+                                style={{ height: '72px', marginTop: '4px', marginBottom: '16px' }}
                                 value={motivoRechazo}
                                 onChange={e => setMotivoRechazo(e.target.value)}
                                 placeholder="Ej: Saldo insuficiente o datos ilegibles"
                             />
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '16px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                                 <button
-                                    className="btn-secondary"
-                                    style={{ color: 'var(--error)' }}
-                                    onClick={() => onAction(pedido.id, 'rechazar')}
+                                    onClick={() => onAction(pedido.id, 'aprobar')}
+                                    style={{
+                                        width: '100%', padding: '16px', borderRadius: '14px', border: 'none',
+                                        background: 'rgba(57,181,74,0.12)', cursor: 'pointer',
+                                        display: 'flex', alignItems: 'center', gap: '12px',
+                                        transition: '0.2s',
+                                    }}
+                                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(57,181,74,0.22)'}
+                                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(57,181,74,0.12)'}
                                 >
-                                    Rechazar Pago
+                                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(57,181,74,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                        <span className="material-icons-round" style={{ color: 'var(--primary-green)', fontSize: '22px' }}>verified</span>
+                                    </div>
+                                    <div style={{ textAlign: 'left' }}>
+                                        <p style={{ margin: 0, fontWeight: 800, color: 'var(--primary-green)', fontSize: '0.95rem' }}>Aprobar Pago</p>
+                                        <p style={{ margin: 0, fontSize: '0.72rem', color: 'var(--text-secondary)', opacity: 0.8 }}>El pedido pasa a preparación</p>
+                                    </div>
                                 </button>
-                                <button className="btn-primary" onClick={() => onAction(pedido.id, 'aprobar')}>
-                                    Aprobar Pago
+
+                                <button
+                                    onClick={() => onAction(pedido.id, 'rechazar')}
+                                    style={{
+                                        width: '100%', padding: '16px', borderRadius: '14px', border: 'none',
+                                        background: 'rgba(255,59,48,0.08)', cursor: 'pointer',
+                                        display: 'flex', alignItems: 'center', gap: '12px',
+                                        transition: '0.2s',
+                                    }}
+                                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,59,48,0.16)'}
+                                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,59,48,0.08)'}
+                                >
+                                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,59,48,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                        <span className="material-icons-round" style={{ color: '#ff3b30', fontSize: '22px' }}>cancel</span>
+                                    </div>
+                                    <div style={{ textAlign: 'left' }}>
+                                        <p style={{ margin: 0, fontWeight: 800, color: '#ff3b30', fontSize: '0.95rem' }}>Rechazar Pago</p>
+                                        <p style={{ margin: 0, fontSize: '0.72rem', color: 'var(--text-secondary)', opacity: 0.8 }}>Marca el comprobante como inválido</p>
+                                    </div>
                                 </button>
                             </div>
                         </>
                     )}
+
+                    {/* Avanzar estado operativo */}
+                    {(() => {
+                        const SIGUIENTE_ESTADO = {
+                            PENDIENTE_PAGO:  { estado: 'PREPARANDO', label: 'Iniciar Preparación',  sub: 'Efectivo confirmado · pasar a cocina', icon: 'restaurant',     color: '#fdbd2d', bg: 'rgba(253,189,45,0.1)' },
+                            PAGO_SUBIDO:     { estado: 'PREPARANDO', label: 'Iniciar Preparación',  sub: 'Pago recibido · pasar a cocina',        icon: 'restaurant',     color: '#fdbd2d', bg: 'rgba(253,189,45,0.1)' },
+                            PAGO_VERIFICADO: { estado: 'PREPARANDO', label: 'Iniciar Preparación',  sub: 'Pago verificado · pasar a cocina',      icon: 'restaurant',     color: '#fdbd2d', bg: 'rgba(253,189,45,0.1)' },
+                            PREPARANDO:      {
+                                estado: pedido.domicilio ? 'DESPACHADO' : 'ENTREGADO',
+                                label:  pedido.domicilio ? 'Despachar Pedido'   : 'Marcar Entregado',
+                                sub:    pedido.domicilio ? 'Salió a domicilio'  : 'Entregado en tienda',
+                                icon:   pedido.domicilio ? 'local_shipping'     : 'check_circle',
+                                color:  pedido.domicilio ? '#4ea8de'            : 'var(--primary-green)',
+                                bg:     pedido.domicilio ? 'rgba(78,168,222,0.1)' : 'rgba(57,181,74,0.1)',
+                            },
+                            DESPACHADO: { estado: 'ENTREGADO', label: 'Confirmar Entrega', sub: 'El cliente recibió su pedido', icon: 'check_circle', color: 'var(--primary-green)', bg: 'rgba(57,181,74,0.1)' },
+                        };
+                        const sig = SIGUIENTE_ESTADO[pedido.estado];
+                        if (!sig) return null;
+                        return (
+                            <>
+                                <Divider />
+                                <SectionLabel>Avanzar Estado</SectionLabel>
+                                <button
+                                    onClick={() => onEstado(pedido.id, sig.estado)}
+                                    style={{
+                                        width: '100%', padding: '16px', borderRadius: '14px', border: `1px solid ${sig.color}30`,
+                                        background: sig.bg, cursor: 'pointer',
+                                        display: 'flex', alignItems: 'center', gap: '12px',
+                                        transition: '0.2s',
+                                    }}
+                                    onMouseEnter={e => e.currentTarget.style.filter = 'brightness(1.15)'}
+                                    onMouseLeave={e => e.currentTarget.style.filter = 'brightness(1)'}
+                                >
+                                    <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: `${sig.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                        <span className="material-icons-round" style={{ color: sig.color, fontSize: '24px' }}>{sig.icon}</span>
+                                    </div>
+                                    <div style={{ flex: 1, textAlign: 'left' }}>
+                                        <p style={{ margin: 0, fontWeight: 800, color: sig.color, fontSize: '0.95rem' }}>{sig.label}</p>
+                                        <p style={{ margin: 0, fontSize: '0.72rem', color: 'var(--text-secondary)', opacity: 0.8 }}>{sig.sub}</p>
+                                    </div>
+                                    <span className="material-icons-round" style={{ color: sig.color, fontSize: '20px', opacity: 0.7 }}>chevron_right</span>
+                                </button>
+                            </>
+                        );
+                    })()}
                 </div>
             </motion.div>
         </motion.div>
@@ -350,6 +429,21 @@ const OrdersAdminPage = () => {
         );
     };
 
+    const handleCambiarEstado = async (pedidoId, estadoNuevo) => {
+      try {
+        const res = await axios.post('http://127.0.0.1:8000/api/v1/ventas/cambiar-estado/', {
+          pedido_id: pedidoId,
+          estado_nuevo: estadoNuevo,
+        });
+        if (res.data.exito) {
+          fetchOrders();
+          setDetailOrder(null);
+        }
+      } catch {
+        alert('Error al cambiar el estado del pedido');
+      }
+    };
+
     return (
         <div className="app-container animate-fade">
             <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
@@ -377,7 +471,7 @@ const OrdersAdminPage = () => {
 
             {/* Filters */}
             <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', overflowX: 'auto', paddingBottom: '8px' }} className="hide-scrollbar">
-                {['TODOS', 'PAGO_SUBIDO', 'PAGO_VERIFICADO', 'PAGO_RECHAZADO', 'DESPACHADO'].map(f => (
+                {['TODOS', 'PAGO_SUBIDO', 'PAGO_VERIFICADO', 'PAGO_RECHAZADO', 'DESPACHADO', 'ENTREGADO'].map(f => (
                     <button
                         key={f}
                         onClick={() => setFiltro(f)}
@@ -416,6 +510,17 @@ const OrdersAdminPage = () => {
                                     <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', margin: 0, opacity: 0.7 }}>
                                         {pedido.metodo_pago === 'TRANSFERENCIA' ? 'Transferencia' : 'Efectivo'}
                                     </p>
+                                    {pedido.domicilio ? (
+                                      <p style={{ fontSize: '0.65rem', margin: 0, color: '#4ea8de', fontWeight: 700 }}>
+                                        <span className="material-icons-round" style={{ fontSize: '10px', verticalAlign: 'middle' }}>delivery_dining</span>{' '}
+                                        Domicilio
+                                      </p>
+                                    ) : (
+                                      <p style={{ fontSize: '0.65rem', margin: 0, color: 'var(--text-secondary)', fontWeight: 700 }}>
+                                        <span className="material-icons-round" style={{ fontSize: '10px', verticalAlign: 'middle' }}>storefront</span>{' '}
+                                        En tienda
+                                      </p>
+                                    )}
                                 </td>
                                 <td style={{ padding: '0 24px' }}>
                                     {renderProductosCell(pedido)}
@@ -472,6 +577,7 @@ const OrdersAdminPage = () => {
                         setMotivoRechazo={setMotivoRechazo}
                         onClose={() => { setDetailOrder(null); setMotivoRechazo(''); }}
                         onAction={handleAction}
+                        onEstado={handleCambiarEstado}
                     />
                 )}
             </AnimatePresence>

@@ -16,6 +16,7 @@ const Checkout = () => {
   const [telefono, setTelefono] = useState('');
   const [nombres, setNombres] = useState('');
   const [apellidos, setApellidos] = useState('');
+  const [esDomicilio, setEsDomicilio] = useState(true);
   const [direccion, setDireccion] = useState('');
   const [observaciones, setObservaciones] = useState('');
   const [metodoPago, setMetodoPago] = useState('efectivo');
@@ -30,6 +31,7 @@ const Checkout = () => {
   const [enviando, setEnviando] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -40,7 +42,12 @@ const Checkout = () => {
 
   // Acción: Continuar al paso 2
   const handleNextStep = async () => {
-    const telLimpio = telefono.replace(/\D/g, ''); 
+    if (!esDomicilio) {
+      setStep(2);
+      return;
+    }
+
+    const telLimpio = telefono.replace(/\D/g, '');
     if (telLimpio.length < 10) return;
 
     setBuscando(true);
@@ -72,7 +79,8 @@ const Checkout = () => {
 
   // Acción: Finalizar Pedido
   const handleConfirmOrder = async () => {
-    if (!direccion || !nombres || !apellidos) return;
+    if (esDomicilio && (!direccion || !nombres || !apellidos)) return;
+    if (!esDomicilio && (!nombres || !apellidos)) return;
     if (metodoPago === 'transferencia' && !comprobante) {
       alert("Por favor adjunta el comprobante de pago");
       return;
@@ -81,6 +89,7 @@ const Checkout = () => {
     setEnviando(true);
     try {
       const formData = new FormData();
+      formData.append('domicilio', esDomicilio);
       formData.append('telefono', telefono);
       formData.append('nombres', nombres);
       formData.append('apellidos', apellidos);
@@ -88,12 +97,12 @@ const Checkout = () => {
       formData.append('notas', observaciones);
       formData.append('metodo_pago', metodoPago);
       formData.append('recordar_direccion', recordarDireccion);
+      formData.append('costo_envio', esDomicilio ? 6000 : 0);
       formData.append('items', JSON.stringify(cart.map(item => ({
         producto: item.id,
         cantidad: item.quantity,
         precio: item.precio
       }))));
-      formData.append('costo_envio', 6000);
       
       if (comprobante) {
         formData.append('comprobante', comprobante);
@@ -129,8 +138,49 @@ const Checkout = () => {
     }
   };
 
-  const envioCost = 6000;
+  const ESTADO_INFO = {
+    PENDIENTE_PAGO:  { label: 'Pendiente de Pago', icon: 'schedule',         color: 'var(--text-secondary)' },
+    PAGO_SUBIDO:     { label: 'Pago Subido',        icon: 'upload',           color: '#fdbd2d' },
+    PAGO_VERIFICADO: { label: 'Pago Verificado',    icon: 'verified',         color: 'var(--primary-green)' },
+    PAGO_RECHAZADO:  { label: 'Pago Rechazado',     icon: 'cancel',           color: 'var(--error, #ff4d4d)' },
+    PREPARANDO:      { label: 'Preparando',          icon: 'restaurant',       color: '#fdbd2d' },
+    DESPACHADO:      { label: 'Despachado',          icon: 'local_shipping',   color: 'var(--primary-green)' },
+    ENTREGADO:       { label: 'Entregado',           icon: 'check_circle',     color: 'var(--primary-green)' },
+  };
+
+  const envioCost = esDomicilio ? 6000 : 0;
   const finalTotal = total + envioCost;
+
+  // Toggle de tipo de pedido 
+  const TipoPedidoToggle = () => (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '8px' }}>
+      {[
+        { valor: true,  icono: 'delivery_dining', label: 'Domicilio' },
+        { valor: false, icono: 'storefront',      label: 'Recoger en Tienda' },
+      ].map(({ valor, icono, label }) => (
+        <motion.div
+          key={String(valor)}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => {
+            setEsDomicilio(valor);
+            setTelefono('');
+            setNombres('');
+            setApellidos('');
+            setDireccion('');
+          }}
+          style={{
+            border: `1px solid ${esDomicilio === valor ? 'var(--primary-green)' : 'rgba(255,255,255,0.05)'}`,
+            background: esDomicilio === valor ? 'rgba(57, 181, 74, 0.08)' : 'var(--surface-low)',
+            padding: '20px 16px', borderRadius: '16px', textAlign: 'center',
+            cursor: 'pointer', transition: 'var(--transition)',
+          }}
+        >
+          <span className="material-icons-round" style={{ fontSize: '28px', color: esDomicilio === valor ? 'var(--primary-green)' : 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>{icono}</span>
+          <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{label}</span>
+        </motion.div>
+      ))}
+    </div>
+  );
 
   return (
     <div className="app-container animate-fade">
@@ -166,9 +216,15 @@ const Checkout = () => {
                     <p className="text-secondary" style={{ maxWidth: '500px', margin: '0 auto 32px' }}>
                         Hemos recibido tu pedido correctamente. En breve nos pondremos en contacto contigo al {telefono} para coordinar la entrega.
                     </p>
-                    <button onClick={() => navigate('/')} className="btn-secondary" style={{ display: 'inline-flex', width: 'auto', padding: '16px 40px' }}>
-                        Volver al Inicio
-                    </button>
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <button onClick={() => navigate('/')} className="btn-secondary" style={{ display: 'inline-flex', width: 'auto', padding: '16px 40px' }}>
+                            Volver al Inicio
+                        </button>
+                        <button onClick={() => navigate('/rastreo')} className="btn-primary" style={{ display: 'inline-flex', width: 'auto', padding: '16px 40px', gap: '8px' }}>
+                            <span className="material-icons-round" style={{ fontSize: '20px' }}>location_searching</span>
+                            Rastrear mi Pedido
+                        </button>
+                    </div>
                 </div>
 
                 {/* INFO DE LA LICO INTEGRADA */}
@@ -221,6 +277,7 @@ const Checkout = () => {
         ) : (
             <div className="checkout-grid" key="main-grid">
             {/* Left Column */}
+            <div>
             <AnimatePresence mode="wait">
               {step === 1 ? (
                 <motion.div
@@ -230,30 +287,37 @@ const Checkout = () => {
                   exit={{ x: 20, opacity: 0 }}
                 >
                   <section className="glass-card" style={{ padding: '32px' }}>
-                    <p className="label-caps" style={{ marginBottom: '24px' }}>Paso 1: Identificación</p>
-                    <div style={{ marginBottom: '24px' }}>
-                      <label style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '8px' }}>NÚMERO DE TELÉFONO</label>
-                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px', opacity: 0.6 }}>Usamos tu número para reconocer tus pedidos anteriores y darte un servicio más rápido.</p>
-                      <input 
-                        type="tel" 
-                        className="premium-input"
-                        autoFocus
-                        autoComplete="off"
-                        style={{ fontSize: '1.4rem', fontWeight: 800, padding: '24px', textAlign: 'center', letterSpacing: '2px' }}
-                        value={telefono} 
-                        onChange={(e) => setTelefono(e.target.value)}
-                        placeholder="300 000 0000"
-                        onKeyDown={(e) => e.key === 'Enter' && handleNextStep()}
-                      />
+                    {/* Toggle del tipo de pedido */}
+                    <div>
+                      <p className="label-caps" style={{ marginBottom: '16px' }}>Tipo de Pedido</p>
+                      <TipoPedidoToggle />
                     </div>
-                    <button 
-                      className="btn-primary" 
-                      disabled={telefono.replace(/\D/g, '').length < 10 || buscando}
-                      onClick={handleNextStep}
-                      style={{ width: '100%', height: '64px', fontSize: '1.1rem' }}
-                    >
-                      {buscando ? 'Buscando cliente...' : 'Siguiente'}
-                    </button>
+                    {/* Solo pedir teléfono para domicilios */}
+                    {esDomicilio && (
+                      <div style={{ marginBottom: '24px' }}>
+                        <p className="label-caps" style={{ marginBottom: '24px' }}>Paso 1: Identificación</p>
+                        <label style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '8px' }}>NÚMERO DE TELÉFONO</label>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px', opacity: 0.6 }}>Usamos tu número para reconocer tus pedidos anteriores y darte un servicio más rápido.</p>
+                        <input 
+                          type="tel" 
+                          className="premium-input"
+                          autoFocus
+                          autoComplete="off"
+                          style={{ fontSize: '1.4rem', fontWeight: 800, padding: '24px', textAlign: 'center', letterSpacing: '2px' }}
+                          value={telefono} 
+                          onChange={(e) => setTelefono(e.target.value)}
+                          placeholder="300 000 0000"
+                          onKeyDown={(e) => e.key === 'Enter' && handleNextStep()}
+                        />
+                      </div>
+                    )}
+
+                    {!esDomicilio && (
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', opacity: 0.7 }}>
+                        Para pedidos en tienda no necesitamos tu número. Completa tus datos en el siguiente paso.
+                      </p>
+                    )}
+
                   </section>
                 </motion.div>
               ) : (
@@ -289,48 +353,60 @@ const Checkout = () => {
                         />
                       </div>
                     </div>
-    
-                    <div style={{ marginBottom: '20px' }}>
-                      <label className="label-caps" style={{ fontSize: '0.65rem' }}>Dirección de Entrega</label>
-                      {direccionesDisponibles.length > 0 && (
-                        <div className="hide-scrollbar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', marginBottom: '12px' }}>
-                          {direccionesDisponibles.map((dep, i) => (
-                            <button 
-                              key={i}
-                              onClick={() => setDireccion(dep)}
-                              style={{
-                                padding: '8px 16px', borderRadius: '24px', fontSize: '0.75rem', fontWeight: 600,
-                                background: direccion === dep ? 'var(--primary-green)' : 'var(--surface-high)',
-                                color: direccion === dep ? 'black' : 'var(--text-secondary)',
-                                border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', transition: '0.2s'
-                              }}
-                            >
-                              {dep.split(',')[0]}
-                            </button>
-                          ))}
+                    { /* Solo pedir dirección para domicilios */ } 
+                    {esDomicilio && (
+                      <div style={{ marginBottom: '20px' }}>
+                        <label className="label-caps" style={{ fontSize: '0.65rem' }}>Dirección de Entrega</label>
+                        {direccionesDisponibles.length > 0 && (
+                          <div className="hide-scrollbar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', marginBottom: '12px' }}>
+                            {direccionesDisponibles.map((dep, i) => (
+                              <button 
+                                key={i}
+                                onClick={() => setDireccion(dep)}
+                                style={{
+                                  padding: '8px 16px', borderRadius: '24px', fontSize: '0.75rem', fontWeight: 600,
+                                  background: direccion === dep ? 'var(--primary-green)' : 'var(--surface-high)',
+                                  color: direccion === dep ? 'black' : 'var(--text-secondary)',
+                                  border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', transition: '0.2s'
+                                }}
+                              >
+                                {dep.split(',')[0]}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        <input 
+                          type="text" 
+                          className="premium-input" 
+                          value={direccion} 
+                          onChange={(e) => setDireccion(e.target.value)}
+                          placeholder="Calle, Carrera, Barrio..."
+                        />
+                        
+                        {esUsuarioNuevo && (
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '12px', cursor: 'pointer' }}>
+                            <input 
+                              type="checkbox" 
+                              checked={recordarDireccion} 
+                              onChange={(e) => setRecordarDireccion(e.target.checked)}
+                              style={{ width: '18px', height: '18px', accentColor: 'var(--primary-green)' }}
+                            />
+                            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Recordar esta dirección para mi próxima compra</span>
+                          </label>
+                        )}
+                      </div>
+                    )}
+
+                    {!esDomicilio && (
+                      <div style={{ background: 'rgba(57, 181, 74, 0.05)', border: '1px dashed rgba(57, 181, 74, 0.2)', borderRadius: '12px', padding: '16px', marginBottom: '20px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <span className="material-icons-round" style={{ color: 'var(--primary-green)' }}>storefront</span>
+                        <div>
+                          <p style={{ margin: 0, fontWeight: 700, fontSize: '0.85rem' }}>Retiro en Cra 68 #61-88, Calatrava, Itagüí</p>
+                          <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Viernes-Sábados: 6PM–2AM · Domingos: 4PM–10PM</p>
                         </div>
-                      )}
-                      <input 
-                        type="text" 
-                        className="premium-input" 
-                        value={direccion} 
-                        onChange={(e) => setDireccion(e.target.value)}
-                        placeholder="Calle, Carrera, Barrio..."
-                      />
-                      
-                      {esUsuarioNuevo && (
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '12px', cursor: 'pointer' }}>
-                          <input 
-                            type="checkbox" 
-                            checked={recordarDireccion} 
-                            onChange={(e) => setRecordarDireccion(e.target.checked)}
-                            style={{ width: '18px', height: '18px', accentColor: 'var(--primary-green)' }}
-                          />
-                          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Recordar esta dirección para mi próxima compra</span>
-                        </label>
-                      )}
-                    </div>
-    
+                      </div>
+                    )}
+
                     <div>
                       <label className="label-caps" style={{ fontSize: '0.65rem' }}>Observaciones (Opcional)</label>
                       <textarea 
@@ -338,11 +414,11 @@ const Checkout = () => {
                         style={{ height: '80px', paddingTop: '12px', resize: 'none' }}
                         value={observaciones}
                         onChange={(e) => setObservaciones(e.target.value)}
-                        placeholder="Instrucciones adicionales, código de apto, etc."
+                        placeholder="Instrucciones adicionales."
                       />
                     </div>
                   </section>
-    
+                  {/* Método de Pago */} 
                   <section className="glass-card" style={{ padding: '28px' }}>
                     <p className="label-caps" style={{ marginBottom: '20px' }}>Método de Pago</p>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
@@ -438,7 +514,24 @@ const Checkout = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-     
+
+              {/* Botón de acción — debajo del formulario */}
+              <button
+                onClick={() => step === 1 ? handleNextStep() : handleConfirmOrder()}
+                className="btn-primary"
+                style={{ width: '100%', height: '60px', fontSize: '1.1rem', marginTop: '20px' }}
+                disabled={
+                  (step === 1 && esDomicilio && (telefono.replace(/\D/g, '').length < 10 || buscando)) ||
+                  (step === 2 && ((!direccion && esDomicilio) || !nombres || !apellidos || enviando || (metodoPago === 'transferencia' && !comprobante)))
+                }
+              >
+                {step === 1
+                  ? (buscando ? 'Buscando...' : 'Siguiente')
+                  : (enviando ? 'Procesando...' : (metodoPago === 'transferencia' ? 'Enviar Comprobante & Pedido' : 'Confirmar Pedido'))
+                }
+              </button>
+            </div>
+
             {/* Right Column: Order Summary */}
             <div>
               <section className="glass-card" style={{ padding: '28px', position: 'sticky', top: '80px' }}>
@@ -462,10 +555,14 @@ const Checkout = () => {
                         </div>
                     ))}
                  </div>
+
+                 {esDomicilio && (
                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '16px' }}>
                     <span>Domicilio (Itagüí)</span>
                     <span>$6.000</span>
                  </div>
+                 )}
+
                  <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '20px 0' }}></div>
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span className="headline-md" style={{ margin: 0, fontSize: '1.1rem' }}>Total</span>
@@ -473,19 +570,9 @@ const Checkout = () => {
                         ${new Intl.NumberFormat('es-CO').format(finalTotal)}
                     </span>
                  </div>
-     
-                <button 
-                  onClick={() => step === 1 ? handleNextStep() : handleConfirmOrder()}
-                  className="btn-primary" 
-                  style={{ marginTop: '28px', height: '60px', fontSize: '1.1rem', width: '100%' }}
-                  disabled={(step === 1 && (telefono.replace(/\D/g, '').length < 10 || buscando)) || (step === 2 && (!direccion || !nombres || !apellidos || enviando || (metodoPago === 'transferencia' && !comprobante)))}
-                >
-                  {step === 1 ? (buscando ? 'Buscando...' : 'Siguiente') : (enviando ? 'Procesando...' : (metodoPago === 'transferencia' ? 'Enviar Comprobante & Pedido' : 'Confirmar Pedido'))}
-                </button>
-                
-                <p style={{ textAlign: 'center', marginTop: '16px', color: 'var(--text-secondary)', fontSize: '0.72rem', opacity: 0.5 }}>
-                  Entrega prioritaria en Itagüí y alrededores.
-                </p>
+                 <p style={{ textAlign: 'center', marginTop: '16px', color: 'var(--text-secondary)', fontSize: '0.72rem', opacity: 0.5 }}>
+                   Entrega prioritaria en Itagüí y alrededores.
+                 </p>
               </section>
             </div>
           </div>

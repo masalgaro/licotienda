@@ -83,6 +83,7 @@ class PedidoSerializer(serializers.ModelSerializer):
     total_productos = serializers.SerializerMethodField()
     final_total = serializers.SerializerMethodField()
     soporte_pago_url = serializers.SerializerMethodField()
+    direccion = serializers.CharField(required=False, allow_blank=True, default="")
 
     class Meta:
         model = Pedido
@@ -91,6 +92,7 @@ class PedidoSerializer(serializers.ModelSerializer):
             "cliente",
             "estado",
             "metodo_pago",
+            "domicilio",
             "costo_envio",
             "direccion",
             "notas",
