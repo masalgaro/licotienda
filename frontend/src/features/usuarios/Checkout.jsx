@@ -31,10 +31,6 @@ const Checkout = () => {
   const [enviando, setEnviando] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
-  // Seguimiento
-  const [telSeguimiento, setTelSeguimiento] = useState('');
-  const [pedidosSeguimiento, setPedidosSeguimiento] = useState(null);
-  const [buscandoPedido, setBuscandoPedido] = useState(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -46,7 +42,12 @@ const Checkout = () => {
 
   // Acción: Continuar al paso 2
   const handleNextStep = async () => {
-    const telLimpio = telefono.replace(/\D/g, ''); 
+    if (!esDomicilio) {
+      setStep(2);
+      return;
+    }
+
+    const telLimpio = telefono.replace(/\D/g, '');
     if (telLimpio.length < 10) return;
 
     setBuscando(true);
@@ -137,21 +138,6 @@ const Checkout = () => {
     }
   };
 
-  // Rastreo del producto
-  const handleBuscarPedido = async () => {
-    const telLimpio = telSeguimiento.replace(/\D/g, '');
-    if (telLimpio.length < 10) return;
-    setBuscandoPedido(true);
-    try {
-      const res = await axios.get(`http://127.0.0.1:8000/api/v1/ventas/seguimiento/?telefono=${telLimpio}`);
-      setPedidosSeguimiento(res.data);
-    } catch {
-      setPedidosSeguimiento([]);
-    } finally {
-      setBuscandoPedido(false);
-    }
-  };
-
   const ESTADO_INFO = {
     PENDIENTE_PAGO:  { label: 'Pendiente de Pago', icon: 'schedule',         color: 'var(--text-secondary)' },
     PAGO_SUBIDO:     { label: 'Pago Subido',        icon: 'upload',           color: '#fdbd2d' },
@@ -230,63 +216,16 @@ const Checkout = () => {
                     <p className="text-secondary" style={{ maxWidth: '500px', margin: '0 auto 32px' }}>
                         Hemos recibido tu pedido correctamente. En breve nos pondremos en contacto contigo al {telefono} para coordinar la entrega.
                     </p>
-                    <button onClick={() => navigate('/')} className="btn-secondary" style={{ display: 'inline-flex', width: 'auto', padding: '16px 40px' }}>
-                        Volver al Inicio
-                    </button>
-                </div>
-
-                {/* SEGUIMIENTO */}
-                {esDomicilio && (
-                    <div className="glass-card" style={{ padding: '32px' }}>
-                        <p className="label-caps" style={{ marginBottom: '8px' }}>Seguimiento de Pedido</p>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '20px' }}>
-                            Consulta el estado de tus pedidos en cualquier momento ingresando tu número.
-                        </p>
-                        <div style={{ display: 'flex', gap: '12px' }}>
-                            <input
-                                type="tel"
-                                className="premium-input"
-                                style={{ flex: 1 }}
-                                placeholder="300 000 0000"
-                                value={telSeguimiento}
-                                onChange={(e) => setTelSeguimiento(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleBuscarPedido()}
-                            />
-                            <button
-                                className="btn-primary"
-                                style={{ width: 'auto', padding: '0 24px' }}
-                                disabled={telSeguimiento.replace(/\D/g, '').length < 10 || buscandoPedido}
-                                onClick={handleBuscarPedido}
-                            >
-                                {buscandoPedido ? '...' : 'Buscar'}
-                            </button>
-                        </div>
-
-                        {pedidosSeguimiento !== null && (
-                            <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                {pedidosSeguimiento.length === 0 ? (
-                                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>No encontramos pedidos para ese número.</p>
-                                ) : pedidosSeguimiento.map(p => {
-                                    const info = ESTADO_INFO[p.estado] || { label: p.estado, icon: 'help', color: 'var(--text-secondary)' };
-                                    return (
-                                        <div key={p.id} style={{ background: 'var(--surface-high)', borderRadius: '16px', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <div>
-                                                <p style={{ fontWeight: 800, margin: '0 0 4px' }}>Pedido #{p.id}</p>
-                                                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>
-                                                    {new Date(p.creado_en).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                                                </p>
-                                            </div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: info.color }}>
-                                                <span className="material-icons-round" style={{ fontSize: '20px' }}>{info.icon}</span>
-                                                <span style={{ fontWeight: 700, fontSize: '0.8rem' }}>{info.label}</span>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <button onClick={() => navigate('/')} className="btn-secondary" style={{ display: 'inline-flex', width: 'auto', padding: '16px 40px' }}>
+                            Volver al Inicio
+                        </button>
+                        <button onClick={() => navigate('/rastreo')} className="btn-primary" style={{ display: 'inline-flex', width: 'auto', padding: '16px 40px', gap: '8px' }}>
+                            <span className="material-icons-round" style={{ fontSize: '20px' }}>location_searching</span>
+                            Rastrear mi Pedido
+                        </button>
                     </div>
-                )}
+                </div>
 
                 {/* INFO DE LA LICO INTEGRADA */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -338,6 +277,7 @@ const Checkout = () => {
         ) : (
             <div className="checkout-grid" key="main-grid">
             {/* Left Column */}
+            <div>
             <AnimatePresence mode="wait">
               {step === 1 ? (
                 <motion.div
@@ -378,14 +318,6 @@ const Checkout = () => {
                       </p>
                     )}
 
-                    <button 
-                      className="btn-primary" 
-                      disabled={telefono.replace(/\D/g, '').length < 10 || buscando}
-                      onClick={handleNextStep}
-                      style={{ width: '100%', height: '64px', fontSize: '1.1rem' }}
-                    >
-                      {buscando ? 'Buscando cliente...' : 'Siguiente'}
-                    </button>
                   </section>
                 </motion.div>
               ) : (
@@ -582,7 +514,24 @@ const Checkout = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-     
+
+              {/* Botón de acción — debajo del formulario */}
+              <button
+                onClick={() => step === 1 ? handleNextStep() : handleConfirmOrder()}
+                className="btn-primary"
+                style={{ width: '100%', height: '60px', fontSize: '1.1rem', marginTop: '20px' }}
+                disabled={
+                  (step === 1 && esDomicilio && (telefono.replace(/\D/g, '').length < 10 || buscando)) ||
+                  (step === 2 && ((!direccion && esDomicilio) || !nombres || !apellidos || enviando || (metodoPago === 'transferencia' && !comprobante)))
+                }
+              >
+                {step === 1
+                  ? (buscando ? 'Buscando...' : 'Siguiente')
+                  : (enviando ? 'Procesando...' : (metodoPago === 'transferencia' ? 'Enviar Comprobante & Pedido' : 'Confirmar Pedido'))
+                }
+              </button>
+            </div>
+
             {/* Right Column: Order Summary */}
             <div>
               <section className="glass-card" style={{ padding: '28px', position: 'sticky', top: '80px' }}>
@@ -607,7 +556,7 @@ const Checkout = () => {
                     ))}
                  </div>
 
-                 {esDomicilio&&(
+                 {esDomicilio && (
                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '16px' }}>
                     <span>Domicilio (Itagüí)</span>
                     <span>$6.000</span>
@@ -621,20 +570,9 @@ const Checkout = () => {
                         ${new Intl.NumberFormat('es-CO').format(finalTotal)}
                     </span>
                  </div>
-     
-                <button 
-                  onClick={() => step === 1 ? handleNextStep() : handleConfirmOrder()}
-                  className="btn-primary" 
-                  style={{ marginTop: '28px', height: '60px', fontSize: '1.1rem', width: '100%' }}
-                  disabled={(step === 1 && esDomicilio && (telefono.replace(/\D/g, '').length < 10 || buscando)) ||
-                    (step === 2 && ((!direccion && esDomicilio) || !nombres || !apellidos || enviando || (metodoPago === 'transferencia' && !comprobante)))}
-                >
-                  {step === 1 ? (buscando ? 'Buscando...' : 'Siguiente') : (enviando ? 'Procesando...' : (metodoPago === 'transferencia' ? 'Enviar Comprobante & Pedido' : 'Confirmar Pedido'))}
-                </button>
-                
-                <p style={{ textAlign: 'center', marginTop: '16px', color: 'var(--text-secondary)', fontSize: '0.72rem', opacity: 0.5 }}>
-                  Entrega prioritaria en Itagüí y alrededores.
-                </p>
+                 <p style={{ textAlign: 'center', marginTop: '16px', color: 'var(--text-secondary)', fontSize: '0.72rem', opacity: 0.5 }}>
+                   Entrega prioritaria en Itagüí y alrededores.
+                 </p>
               </section>
             </div>
           </div>

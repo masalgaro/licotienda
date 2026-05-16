@@ -78,9 +78,9 @@ class CrearPedidoView(APIView):
             data.get("recordar_direccion") == "true" or data.get("recordar_direccion") is True
         )
         metodo_pago = data.get("metodo_pago", "EFECTIVO").upper()
-        es_domicilio = data.get("domicilio", "true") not in ("fales", False)
+        es_domicilio = data.get("domicilio", "true") not in ("false", False)
 
-        if not items_data or (es_domicilio and not (telefono_raw or direccion)):
+        if not items_data or (es_domicilio and not (telefono_raw and direccion)):
             return Response({"error": "Datos Incompletos"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not telefono_raw: # Usuario temporal
@@ -354,7 +354,7 @@ class CambiarEstadoPedidoView(APIView):
 
     def post(self, request):
         pedido_id = request.data.get("pedido_id")
-        estado_nuevo = request.data.get("accion") # El estado nuevo para el producto
+        estado_nuevo = request.data.get("estado_nuevo")
 
         if not pedido_id or not estado_nuevo:
             return Response({"error": "Datos incompletos"}, status=status.HTTP_400_BAD_REQUEST)
@@ -370,6 +370,6 @@ class CambiarEstadoPedidoView(APIView):
             pedido.estado = estado_nuevo
             pedido.save()
 
-            return Response({"éxito": True, "estado_nuevo": pedido.estado})
+            return Response({"exito": True, "estado_nuevo": pedido.estado})
         except Pedido.DoesNotExist:
             return Response({"error": "Pedido no encontrado"}, status=status.HTTP_404_NOT_FOUND)
