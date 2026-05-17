@@ -180,6 +180,12 @@ class CrearPedidoView(APIView):
                     # Si todo bien, guardamos el pedido
                     pedido = serializer.save()
 
+                    try:
+                        from ventas.notificaciones import notificar_pedido_recibido_admin
+                        notificar_pedido_recibido_admin(pedido)
+                    except Exception as e:
+                        print(f"[Notificacion] Error admin: {e}")
+
                     # 4. Crear Soporte de Pago if Transferencia
                     if metodo_pago == "TRANSFERENCIA" and comprobante:
                         SoportePago.objects.create(
@@ -331,6 +337,14 @@ class GestionarPagoPedidoView(APIView):
                     soporte.save()
 
             pedido.save()
+
+            if accion == "aprobar":
+                try:
+                    from ventas.notificaciones import notificar_pago_verificado_cliente
+                    notificar_pago_verificado_cliente(pedido)
+                except Exception as e:
+                    print(f"[Notificacion] Error cliente pago verificado: {e}")
+
             return Response({"exito": True, "estado_nuevo": pedido.estado})
         except Pedido.DoesNotExist:
             return Response({"error": "Pedido no encontrado"}, status=status.HTTP_404_NOT_FOUND)
@@ -369,6 +383,13 @@ class CambiarEstadoPedidoView(APIView):
 
             pedido.estado = estado_nuevo
             pedido.save()
+
+            if estado_nuevo == "DESPACHADO":
+                try:
+                    from ventas.notificaciones import notificar_pedido_despachado_cliente
+                    notificar_pedido_despachado_cliente(pedido)
+                except Exception as e:
+                    print(f"[Notificacion] Error cliente despachado: {e}")
 
             return Response({"exito": True, "estado_nuevo": pedido.estado})
         except Pedido.DoesNotExist:

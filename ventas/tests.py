@@ -1,7 +1,9 @@
 import json
 import unittest
 from decimal import Decimal
+from unittest.mock import patch
 
+from django.conf import settings
 from django.test import TestCase
 
 from granizados.infraestructura.models import Granizado, Ingrediente
@@ -283,3 +285,54 @@ class VentasDomicilioYEstadoTests(TestCase):
         self.assertEqual(response.status_code, 403)
         pedido.refresh_from_db()
         self.assertEqual(pedido.estado, "PREPARANDO")
+
+
+class NotificacionesHU25Tests(TestCase):
+    """CP-HU25-01, CP-HU25-02, CP-HU25-03"""
+
+    def setUp(self):
+        self.cliente = Usuario.objects.create_user(
+            username="cliente_notif",
+            telefono="3001234567",
+            first_name="Ana",
+            last_name="López",
+        )
+        self.pedido = Pedido.objects.create(
+            cliente=self.cliente,
+            estado="PAGO_VERIFICADO",
+            domicilio=True,
+            direccion="Calle 10 # 20-30, Itagüí",
+            costo_envio=6000,
+            metodo_pago="TRANSFERENCIA",
+        )
+
+    def test_cp_hu25_01_notifica_pago_verificado_cliente(self):
+        with patch("ventas.notificaciones.enviar_whatsapp") as mock_enviar:
+            from ventas.notificaciones import notificar_pago_verificado_cliente
+            notificar_pago_verificado_cliente(self.pedido)
+
+        mock_enviar.assert_called_once()
+        telefono_usado, mensaje = mock_enviar.call_args[0]
+        self.assertEqual(telefono_usado, self.cliente.telefono)
+        self.assertIn("verificado", mensaje.lower())
+
+    def test_cp_hu25_02_notifica_pedido_despachado_cliente(self):
+        with patch("ventas.notificaciones.enviar_whatsapp") as mock_enviar:
+            from ventas.notificaciones import notificar_pedido_despachado_cliente
+            notificar_pedido_despachado_cliente(self.pedido)
+
+        mock_enviar.assert_called_once()
+        telefono_usado, mensaje = mock_enviar.call_args[0]
+        self.assertEqual(telefono_usado, self.cliente.telefono)
+        self.assertTrue(
+            "despachado" in mensaje.lower() or "camino" in mensaje.lower()
+        )
+
+    def test_cp_hu25_03_notifica_pedido_recibido_admin(self):
+        with patch("ventas.notificaciones.enviar_whatsapp") as mock_enviar:
+            from ventas.notificaciones import notificar_pedido_recibido_admin
+            notificar_pedido_recibido_admin(self.pedido)
+
+        mock_enviar.assert_called_once()
+        telefono_usado, _ = mock_enviar.call_args[0]
+        self.assertEqual(telefono_usado, settings.ADMIN_WHATSAPP)

@@ -35,3 +35,9 @@ ruff==0.15.7
 
 # Cobertura de Pruebas
 coverage==7.8.0
+
+twilio==9.10.9
+
+
+python-dotenv==1.2.2
+
