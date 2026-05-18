@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { WHATSAPP_SOPORTE } from '../../config';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useCart } from '../../shared/cartHooks';

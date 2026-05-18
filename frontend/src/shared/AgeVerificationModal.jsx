@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AgeVerificationModal = () => {
-    const [isVisible, setIsVisible] = useState(() => {
-        return !localStorage.getItem('laLico_age_verified');
-    });
+    const { pathname } = useLocation();
+    const isAdminRoute = pathname.startsWith('/admin');
+    const [isVisible, setIsVisible] = useState(!isAdminRoute);
     const [isBlocked, setIsBlocked] = useState(false);
 
     useEffect(() => {
@@ -14,7 +15,6 @@ const AgeVerificationModal = () => {
     }, [isVisible]);
 
     const handleYes = () => {
-        localStorage.setItem('laLico_age_verified', 'true');
         setIsVisible(false);
         document.body.style.overflow = 'auto'; // Restaurar scroll
     };
