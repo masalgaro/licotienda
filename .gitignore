@@ -32,3 +32,4 @@ CLAUDE.md
 .agent
 .agents
 .vscode
+.github/workflows/.env
