@@ -389,20 +389,21 @@ const StorePage = () => {
 /* ======== Sub-Components ======== */
 
 const CategoryPill = ({ label, active, onClick }) => (
-    <button 
+    <button
         onClick={onClick}
         style={{
-            padding: '10px 22px',
+            padding: '11px 26px',
             borderRadius: '24px',
-            border: `1px solid ${active ? 'var(--primary-green)' : 'rgba(255,255,255,0.06)'}`,
+            border: `1.5px solid ${active ? 'var(--primary-green)' : 'rgba(255,255,255,0.22)'}`,
             background: active ? 'var(--primary-green)' : 'var(--surface-low)',
             color: active ? 'var(--bg-black)' : 'var(--text-primary)',
-            fontSize: '0.82rem',
+            fontSize: '0.95rem',
             fontWeight: 700,
             whiteSpace: 'nowrap',
             cursor: 'pointer',
             transition: 'var(--transition)',
             fontFamily: 'var(--font-body)',
+            letterSpacing: '0.01em',
         }}
     >
         {label}

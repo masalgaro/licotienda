@@ -907,7 +907,7 @@ const InventoryAdminPage = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="label-caps">Existencias (und)</label>
+                                        <label className="label-caps">Stock mínimo (und)</label>
                                         <input
                                             type="number"
                                             className="premium-input"
@@ -920,6 +920,18 @@ const InventoryAdminPage = () => {
                                                 })
                                             }
                                         />
+                                        <p
+                                            style={{
+                                                fontSize: '0.72rem',
+                                                color: 'var(--text-secondary)',
+                                                marginTop: '6px',
+                                                lineHeight: 1.4
+                                            }}
+                                        >
+                                            Cantidad mínima de unidades antes de considerar el producto agotado.
+                                            Cuando el stock llegue a este número, el producto se marcará como no
+                                            disponible en la tienda.
+                                        </p>
                                     </div>
                                 </div>
                                 <div
