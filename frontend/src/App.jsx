@@ -14,10 +14,12 @@ import OrdersAdminPage from './features/ventas/OrdersAdminPage';
 import RastreoPedidos from './features/ventas/RastreoPedidos';
 import GranizadosAdminPage from './features/catalogo/GranizadosAdminPage';
 import PrivateRoute from './shared/PrivateRoute';
+import AgeVerificationModal from './shared/AgeVerificationModal';
 
 function App() {
     return (
         <Router>
+            <AgeVerificationModal />
             <Routes>
                 <Route path="/" element={<StorePage />} />
                 <Route path="/armar-granizado" element={<GranizadoBuilder />} />

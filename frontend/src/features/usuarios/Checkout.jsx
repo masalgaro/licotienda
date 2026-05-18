@@ -23,6 +23,7 @@ const Checkout = () => {
   const [comprobante, setComprobante] = useState(null);
   const [comprobantePreview, setComprobantePreview] = useState(null);
   const [recordarDireccion, setRecordarDireccion] = useState(true);
+  const [aceptoDatos, setAceptoDatos] = useState(false);
   
   // Data State
   const [direccionesDisponibles, setDireccionesDisponibles] = useState([]);
@@ -417,6 +418,20 @@ const Checkout = () => {
                         placeholder="Instrucciones adicionales."
                       />
                     </div>
+
+                    <div style={{ marginTop: '20px' }}>
+                      <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
+                        <input 
+                          type="checkbox" 
+                          checked={aceptoDatos} 
+                          onChange={(e) => setAceptoDatos(e.target.checked)}
+                          style={{ width: '18px', height: '18px', accentColor: 'var(--primary-green)', marginTop: '2px' }}
+                        />
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                          Acepto el tratamiento de mis datos personales conforme a la política de privacidad de La Lico.
+                        </span>
+                      </label>
+                    </div>
                   </section>
                   {/* Método de Pago */} 
                   <section className="glass-card" style={{ padding: '28px' }}>
@@ -522,7 +537,7 @@ const Checkout = () => {
                 style={{ width: '100%', height: '60px', fontSize: '1.1rem', marginTop: '20px' }}
                 disabled={
                   (step === 1 && esDomicilio && (telefono.replace(/\D/g, '').length < 10 || buscando)) ||
-                  (step === 2 && ((!direccion && esDomicilio) || !nombres || !apellidos || enviando || (metodoPago === 'transferencia' && !comprobante)))
+                  (step === 2 && ((!direccion && esDomicilio) || !nombres || !apellidos || !aceptoDatos || enviando || (metodoPago === 'transferencia' && !comprobante)))
                 }
               >
                 {step === 1
