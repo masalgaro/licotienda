@@ -87,7 +87,15 @@ const CartPage = () => {
                                     style={{ padding: '16px', margin: 0, display: 'flex', gap: '16px', alignItems: 'center' }}
                                 >
                                     <div style={{ width: '72px', height: '72px', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                        <img src={item.imagen ? (item.imagen.startsWith('http') ? item.imagen : `${API_BASE_URL}${item.imagen}`) : (item.imagen_url || '/placeholder.png')} alt={item.nombre} style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
+                                        <img
+                                            src={
+                                                item.imagen
+                                                    ? (item.imagen.startsWith('http') ? item.imagen : `${API_BASE_URL}${item.imagen}`)
+                                                    : (item.imagen_url || (item.tipo === 'granizado' ? '/productos/granizado/GRANIZADO_PRUEBA.png' : '/placeholder.png'))
+                                            }
+                                            alt={item.nombre}
+                                            style={{ width: '80%', height: '80%', objectFit: 'contain' }}
+                                        />
                                     </div>
                                     
                                     <div style={{ flexGrow: 1, minWidth: 0 }}>
