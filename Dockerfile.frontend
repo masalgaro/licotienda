@@ -6,7 +6,7 @@ WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci --ignore-scripts
 
-COPY frontend/ .
+COPY frontend/ /app/
 
 # La URL del backend se inyecta en build time
 ARG VITE_API_URL=http://localhost:8000
