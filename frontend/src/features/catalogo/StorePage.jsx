@@ -63,7 +63,7 @@ const StorePage = () => {
             try {
                 const [prodRes, catRes] = await Promise.all([
                     axios.get(buildCatalogUrl('', null, false)),
-                    axios.get('http://127.0.0.1:8000/api/v1/catalogo/categorias/')
+                    axios.get(`${API_BASE_URL}/api/v1/catalogo/categorias/`)
                 ]);
                 setProductos(prodRes.data);
                 setCategorias(catRes.data);
@@ -440,7 +440,7 @@ const ProductCard = ({ producto, addToCart }) => {
             }}>
                 {!imgError ? (
                     <img 
-                        src={producto.imagen ? (producto.imagen.startsWith('http') ? producto.imagen : `${API_BASE_URL}${producto.imagen}`) : (producto.imagen_url || '/placeholder.png')} 
+                        src={producto.imagen ? (producto.imagen.startsWith('http') ? producto.imagen : producto.imagen) : (producto.imagen_url || '/placeholder.png')}
                         alt={producto.nombre} 
                         style={{ width: '80%', height: '80%', objectFit: 'contain', transition: 'transform 0.4s ease' }}
                         onError={() => setImgError(true)}
