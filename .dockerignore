@@ -16,11 +16,6 @@ local_settings.py
 frontend/node_modules/
 frontend/dist/
 
-# Entorno
-.env
-.env.*
-!.env.example
-
 # Documentacion
 .git/
 .gitignore
