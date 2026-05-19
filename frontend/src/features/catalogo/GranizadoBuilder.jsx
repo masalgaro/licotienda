@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useCart } from '../../shared/cartHooks';
+import { API_BASE_URL } from '../../config';
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
 const PRECIO_BASE = 12000;
 
 const SIZES = [

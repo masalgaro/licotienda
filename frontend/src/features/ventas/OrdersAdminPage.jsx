@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { WHATSAPP_NEGOCIO } from '../../config';
+import { API_BASE_URL } from '../../config';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
@@ -211,7 +212,7 @@ const OrderDetailModal = ({ pedido, motivoRechazo, setMotivoRechazo, onClose, on
                                     minHeight: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 }}>
                                     <img
-                                        src={`http://127.0.0.1:8000${pedido.soporte_pago_url}`}
+                                        src={`${API_BASE_URL}${pedido.soporte_pago_url}`}
                                         style={{ maxWidth: '100%', maxHeight: '460px', objectFit: 'contain' }}
                                         alt="Comprobante"
                                         onError={e => { e.target.src = 'https://placehold.co/400x600?text=Sin+imagen'; }}
@@ -348,7 +349,7 @@ const OrdersAdminPage = () => {
 
     const fetchOrders = async () => {
         try {
-            const res = await axios.get('http://127.0.0.1:8000/api/v1/ventas/todos/');
+            const res = await axios.get('${API_BASE_URL}/api/v1/ventas/todos/');
             setPedidos(res.data);
         } catch (_err) {
             console.error('Error fetching orders:', _err);
@@ -366,7 +367,7 @@ const OrdersAdminPage = () => {
             return;
         }
         try {
-            const res = await axios.post('http://127.0.0.1:8000/api/v1/ventas/gestionar-pago/', {
+            const res = await axios.post('${API_BASE_URL}/api/v1/ventas/gestionar-pago/', {
                 pedido_id: pedidoId,
                 accion,
                 motivo: motivoRechazo,
@@ -431,7 +432,7 @@ const OrdersAdminPage = () => {
 
     const handleCambiarEstado = async (pedidoId, estadoNuevo) => {
       try {
-        const res = await axios.post('http://127.0.0.1:8000/api/v1/ventas/cambiar-estado/', {
+        const res = await axios.post('${API_BASE_URL}/api/v1/ventas/cambiar-estado/', {
           pedido_id: pedidoId,
           estado_nuevo: estadoNuevo,
         });

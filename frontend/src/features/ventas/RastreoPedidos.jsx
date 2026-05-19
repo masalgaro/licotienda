@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { API_BASE_URL } from '../../config':
 
 const ESTADO_INFO = {
     PENDIENTE_PAGO:  { label: 'Pendiente de Pago', icon: 'schedule',       color: 'var(--text-secondary)' },
@@ -29,7 +30,7 @@ const RastreoPedidos = () => {
         setBuscando(true);
         try {
             const res = await axios.get(
-                `http://127.0.0.1:8000/api/v1/ventas/seguimiento/?telefono=${tel}`
+                `${API_BASE_URL}/api/v1/ventas/seguimiento/?telefono=${tel}`
             );
             setPedidos(res.data);
         } catch {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { WHATSAPP_SOPORTE } from '../../config';
+import { API_BASE_URL } from '../../config';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -53,7 +54,7 @@ const Checkout = () => {
 
     setBuscando(true);
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/api/v1/usuarios/buscar-telefono/?telefono=${telLimpio}`);
+      const res = await axios.get(`API_BASE_URL/api/v1/usuarios/buscar-telefono/?telefono=${telLimpio}`);
       if (res.data.encontrado) {
         setNombres(res.data.nombre || '');
         setApellidos(res.data.apellido || '');
@@ -109,7 +110,7 @@ const Checkout = () => {
         formData.append('comprobante', comprobante);
       }
 
-      const res = await axios.post('http://127.0.0.1:8000/api/v1/ventas/pedidos/', formData, {
+      const res = await axios.post('${API_BASE_URL}/api/v1/ventas/pedidos/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       

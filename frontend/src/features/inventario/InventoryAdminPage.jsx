@@ -3,8 +3,8 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, ToggleLeft, ToggleRight, Edit2, Trash2, LogOut } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
 const VISTA_TODOS = 'todos';
 const VISTA_OFERTAS = 'ofertas';
 const EMPTY_PRODUCT = {
