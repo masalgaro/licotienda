@@ -551,7 +551,7 @@ const InventoryAdminPage = () => {
                                                                 producto.imagen
                                                                     ? producto.imagen.startsWith('http')
                                                                         ? producto.imagen
-                                                                        : `${API_BASE_URL}${producto.imagen}`
+                                                                        : producto.imagen
                                                                     : producto.imagen_url || '/placeholder.png'
                                                             }
                                                             alt={producto.nombre}

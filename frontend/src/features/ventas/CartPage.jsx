@@ -89,7 +89,7 @@ const CartPage = () => {
                                         <img
                                             src={
                                                 item.imagen
-                                                    ? (item.imagen.startsWith('http') ? item.imagen : `${API_BASE_URL}${item.imagen}`)
+                                                    ? (item.imagen.startsWith('http') ? item.imagen : item.imagen)
                                                     : (item.imagen_url || (item.tipo === 'granizado' ? '/productos/granizado/GRANIZADO_PRUEBA.png' : '/placeholder.png'))
                                             }
                                             alt={item.nombre}
@@ -143,7 +143,7 @@ const CartPage = () => {
                                             }}
                                         >
                                             <div style={{ height: '80px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <img src={prod.imagen ? (prod.imagen.startsWith('http') ? prod.imagen : `${API_BASE_URL}${prod.imagen}`) : (prod.imagen_url || '/placeholder.png')} alt={prod.nombre} style={{ width: '60%', height: '60%', objectFit: 'contain' }} />
+                                                <img src={prod.imagen ? (prod.imagen.startsWith('http') ? prod.imagen : prod.imagen) : (prod.imagen_url || '/placeholder.png')} alt={prod.nombre} style={{ width: '60%', height: '60%', objectFit: 'contain' }} />
                                             </div>
                                             <h4 style={{ fontSize: '0.75rem', fontWeight: 600, height: '2.4em', overflow: 'hidden', margin: 0 }}>{prod.nombre}</h4>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
