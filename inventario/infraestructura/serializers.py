@@ -4,6 +4,16 @@ from .models import CategoriaModelo, ProductoModelo
 
 
 class ProductoInventarioSerializer(serializers.ModelSerializer):
+    imagen = serializers.SerializerMethodField()
+
+    def get_imagen(self, obj):
+        if not obj.imagen:
+            return None
+        name = obj.imagen.name if hasattr(obj.imagen, 'name') else str(obj.imagen)
+        if name.startswith('/'):
+            return name
+        return f'/{name}'
+
     class Meta:
         model = ProductoModelo
         fields = "__all__"
