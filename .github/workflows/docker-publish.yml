@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  DJANGO_ADMIN_PASSWORD: '${{ secrets.DJANGO_ADMIN_PASSWORD }}'
+  VITE_API_URL: '${{ secrets.VITE_API_URL }}'
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -32,6 +35,8 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USER }}/lalico-backend:latest
             ${{ secrets.DOCKERHUB_USER }}/lalico-backend:${{ github.sha }}
+          build-args:
+            DJANGO_ADMIN_PASSWORD=${{ secrets.DJANGO_ADMIN_PASSWORD }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
