@@ -4,9 +4,9 @@ from .models import CategoriaModelo, ProductoModelo
 
 
 class ProductoInventarioSerializer(serializers.ModelSerializer):
-    imagen = serializers.SerializerMethodField()
+    imagen_url = serializers.SerializerMethodField()
 
-    def get_imagen(self, obj):
+    def get_imagen_url(self, obj):
         if not obj.imagen:
             return None
         name = obj.imagen.name if hasattr(obj.imagen, 'name') else str(obj.imagen)

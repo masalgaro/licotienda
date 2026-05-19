@@ -548,11 +548,7 @@ const InventoryAdminPage = () => {
                                                     >
                                                         <img
                                                             src={
-                                                                producto.imagen
-                                                                    ? producto.imagen.startsWith('http')
-                                                                        ? producto.imagen
-                                                                        : producto.imagen
-                                                                    : producto.imagen_url || '/placeholder.png'
+                                                                producto.imagen_url || '/placeholder.png'
                                                             }
                                                             alt={producto.nombre}
                                                             style={{
