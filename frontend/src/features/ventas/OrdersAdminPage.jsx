@@ -350,7 +350,7 @@ const OrdersAdminPage = () => {
     const fetchOrders = async () => {
         try {
             const res = await axios.get('${API_BASE_URL}/api/v1/ventas/todos/');
-            setPedidos(res.data);
+            setPedidos(Array.isArray(res.data) ? res.data : []);
         } catch (_err) {
             console.error('Error fetching orders:', _err);
         }
@@ -398,7 +398,7 @@ const OrdersAdminPage = () => {
         }
     };
 
-    const filteredPedidos = pedidos.filter(p => filtro === 'TODOS' || p.estado === filtro);
+    const filteredPedidos = (pedidos || []).filter(p => filtro === 'TODOS' || p.estado === filtro);
 
     const renderProductosCell = pedido => {
         const names = (pedido.items || []).map(i => i.granizado_nombre || i.producto_nombre).filter(Boolean);
