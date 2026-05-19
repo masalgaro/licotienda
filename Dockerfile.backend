@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt gunicorn
 COPY . /app/
 
 RUN python manage.py collectstatic --noinput
+RUN python manage.py migrate # Realizar las migraciones
 RUN python manage.py crear_admin --username admin
 
 EXPOSE 8000
