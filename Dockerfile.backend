@@ -20,3 +20,5 @@ RUN DJANGO_PASS=$DJANGO_ADMIN_PASSWORD
 RUN python manage.py crear_admin --username admin --password $DJANGO_ADMIN_PASSWORD # Crea un admin inicial con la variable del ambiente
 
 EXPOSE 8000
+
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2"]
