@@ -1,0 +1,37 @@
+#Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+#Django
+db.sqlite3
+/media/
+/staticfiles/
+local_settings.py
+
+# Frontend dependencias
+frontend/node_modules/
+frontend/dist/
+
+# Entorno
+.env
+.env.*
+!.env.example
+
+# Documentacion
+.git/
+.gitignore
+CLAUDE.md
+.claude/
+.agent/
+*.md
+*.pdf
+docs/
+
+# Tests
+/tests/
+frontend/coverage/
+*.test.jsx
