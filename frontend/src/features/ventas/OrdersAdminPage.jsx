@@ -349,7 +349,7 @@ const OrdersAdminPage = () => {
 
     const fetchOrders = async () => {
         try {
-            const res = await axios.get('${API_BASE_URL}/api/v1/ventas/todos/');
+            const res = await axios.get(`${API_BASE_URL}/api/v1/ventas/todos/`);
             setPedidos(Array.isArray(res.data) ? res.data : []);
         } catch (_err) {
             console.error('Error fetching orders:', _err);
@@ -367,7 +367,7 @@ const OrdersAdminPage = () => {
             return;
         }
         try {
-            const res = await axios.post('${API_BASE_URL}/api/v1/ventas/gestionar-pago/', {
+            const res = await axios.post(`${API_BASE_URL}/api/v1/ventas/gestionar-pago/`, {
                 pedido_id: pedidoId,
                 accion,
                 motivo: motivoRechazo,
@@ -432,7 +432,7 @@ const OrdersAdminPage = () => {
 
     const handleCambiarEstado = async (pedidoId, estadoNuevo) => {
       try {
-        const res = await axios.post('${API_BASE_URL}/api/v1/ventas/cambiar-estado/', {
+        const res = await axios.post(`${API_BASE_URL}/api/v1/ventas/cambiar-estado/`, {
           pedido_id: pedidoId,
           estado_nuevo: estadoNuevo,
         });

@@ -54,7 +54,7 @@ const Checkout = () => {
 
     setBuscando(true);
     try {
-      const res = await axios.get(`API_BASE_URL/api/v1/usuarios/buscar-telefono/?telefono=${telLimpio}`);
+      const res = await axios.get(`${API_BASE_URL}/api/v1/usuarios/buscar-telefono/?telefono=${telLimpio}`);
       if (res.data.encontrado) {
         setNombres(res.data.nombre || '');
         setApellidos(res.data.apellido || '');
@@ -110,7 +110,7 @@ const Checkout = () => {
         formData.append('comprobante', comprobante);
       }
 
-      const res = await axios.post('${API_BASE_URL}/api/v1/ventas/pedidos/', formData, {
+      const res = await axios.post(`${API_BASE_URL}/api/v1/ventas/pedidos/`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       

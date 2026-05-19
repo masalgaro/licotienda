@@ -83,14 +83,6 @@ class CrearPedidoView(APIView):
         if not items_data or (es_domicilio and not (telefono_raw and direccion)):
             return Response({"error": "Datos Incompletos"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not telefono_raw: # Usuario temporal
-            usuario = Usuario.objects.create_user(
-                username=f"tienda_{get_random_string(8)}",
-                telefono="",
-                first_name=nombres,
-                last_name=apellidos,
-            )
-
         if metodo_pago == "TRANSFERENCIA" and not comprobante:
             return Response(
                 {"error": "Debe adjuntar el comprobante de pago para transferencias"},
@@ -98,22 +90,31 @@ class CrearPedidoView(APIView):
             )
 
         # 1. Identificar o Crear Usuario
-        tel_limpio = re.sub(r"\D", "", telefono_raw)
-        usuario = Usuario.objects.filter(telefono__icontains=tel_limpio).first()
-
-        if not usuario:
+        if not telefono_raw:
+            # Pedido en tienda sin teléfono — usuario temporal
             usuario = Usuario.objects.create_user(
-                username=f"user_{tel_limpio}_{Usuario.objects.count()}",
-                telefono=tel_limpio,
+                username=f"tienda_{get_random_string(8)}",
+                telefono=None,
                 first_name=nombres,
                 last_name=apellidos,
             )
         else:
-            if nombres:
-                usuario.first_name = nombres
-            if apellidos:
-                usuario.last_name = apellidos
-            usuario.save()
+            tel_limpio = re.sub(r"\D", "", telefono_raw)
+            usuario = Usuario.objects.filter(telefono__icontains=tel_limpio).first()
+
+            if not usuario:
+                usuario = Usuario.objects.create_user(
+                    username=f"user_{tel_limpio}_{Usuario.objects.count()}",
+                    telefono=tel_limpio,
+                    first_name=nombres,
+                    last_name=apellidos,
+                )
+            else:
+                if nombres:
+                    usuario.first_name = nombres
+                if apellidos:
+                    usuario.last_name = apellidos
+                usuario.save()
 
         # 2. Dirección
         if recordar and direccion:
