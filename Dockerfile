@@ -14,6 +14,6 @@ RUN pip install --no-cache-dir -r requirements.txt gunicorn
 COPY . .
 
 RUN python manage.py collectstatic --noinput
-RUN python manage.py crear_admin --username admin --password lalico2025
+RUN python manage.py crear_admin --username admin
 
 EXPOSE 8000
