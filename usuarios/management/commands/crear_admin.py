@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
         password = options["password"]
         if not password:
-            password = os.environ.get("DJANGO_ADMING_PASSWORD") or input(f"Contraseña para '{username}': ")
+            password = os.environ.get("DJANGO_ADMIN_PASSWORD") or input(f"Contraseña para '{username}': ")
 
         u = Usuario.objects.create_superuser(username=username, password=password)
         u.es_administrador = True
