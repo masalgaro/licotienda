@@ -1,12 +1,10 @@
 FROM python:3.12-slim
 
-ARG DJANGO_ADMIN_PASSWORD=${DJANGO_ADMIN_PASSWORD}
-
+ARG DJANGO_ADMIN_PASSWORD=lalico2025
 ENV DJANGO_ADMIN_PASSWORD=${DJANGO_ADMIN_PASSWORD}
 
 WORKDIR /app
 
-# Dependencias mínimas
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /app/
@@ -15,9 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt gunicorn
 COPY . /app/
 
 RUN python manage.py collectstatic --noinput
-RUN python manage.py migrate # Realizar las migraciones
-RUN DJANGO_PASS=$DJANGO_ADMIN_PASSWORD
-RUN python manage.py crear_admin --username admin --password $DJANGO_ADMIN_PASSWORD # Crea un admin inicial con la variable del ambiente
+RUN python manage.py migrate
+RUN python manage.py crear_admin --username admin --password "${DJANGO_ADMIN_PASSWORD}"
 
 EXPOSE 8000
 
