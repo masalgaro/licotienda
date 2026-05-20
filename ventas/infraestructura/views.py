@@ -125,10 +125,10 @@ class CrearPedidoView(APIView):
             usuario.save()
 
         # 3. Serializar y Guardar Pedido
-        if not es_domicilio:
-            estado_inicial = "PREPARANDO"
-        elif metodo_pago == "TRANSFERENCIA":
+        if metodo_pago == "TRANSFERENCIA":
             estado_inicial = "PAGO_SUBIDO"
+        elif not es_domicilio:
+            estado_inicial = "PREPARANDO"
         else:
             estado_inicial = "PENDIENTE_PAGO"
 
