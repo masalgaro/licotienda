@@ -166,7 +166,7 @@ const StorePage = () => {
                         }} 
                     />
                     <div>
-                        <h1 className="display-lg" style={{ color: 'var(--primary-green)', margin: 0, fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>LaLico</h1>
+                        <h1 className="display-lg" style={{ fontFamily: '"Roboto Condensed", sans-serif', color: 'var(--primary-green)', margin: 0, fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>LaLico</h1>
                         <p className="label-caps" style={{ margin: 0 }}>Premium Liquor Store • Itagüí</p>
                     </div>
                 </header>
