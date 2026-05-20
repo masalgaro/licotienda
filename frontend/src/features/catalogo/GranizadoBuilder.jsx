@@ -568,7 +568,14 @@ const GranizadoBuilder = () => {
     return (
         <div
             className="app-container"
-            style={{ minHeight: '100vh', paddingBottom: step === 2 ? '0' : '40px' }}
+            style={{ 
+                minHeight: '100vh', 
+                paddingBottom: step === 2 ? '0' : '40px',
+                backgroundImage: `linear-gradient(to bottom, rgba(10,10,10,0.6), rgba(10,10,10,0.95)), url('/tropical_bg_granizados.png')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundAttachment: 'fixed',
+            }}
         >
             <AnimatePresence mode="wait">
                 {step === 1 && renderStep1()}
